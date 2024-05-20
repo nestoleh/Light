@@ -1,0 +1,6 @@
+<resources>
+    <string name="button_switch">Клік</string>
+    <string name="label_light_status">Світло\n%1$s</string>
+    <string name="label_status_on">УВІМКНЕНО</string>
+    <string name="label_status_off">ВИМКНЕНО</string>
+</resources>
