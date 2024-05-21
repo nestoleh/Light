@@ -1,6 +1,7 @@
 <resources>
-    <string name="button_switch">Клік</string>
-    <string name="label_light_status">Світло\n%1$s</string>
-    <string name="label_status_on">УВІМКНЕНО</string>
-    <string name="label_status_off">ВИМКНЕНО</string>
+    <string name="button_add_home">Додати помешкання</string>
+    <string name="add_home_title">Додати помешкання</string>
+    <string name="field_home_name">Назва</string>
+    <string name="button_save">Зберегти</string>
+    <string name="validator_home_name_empty_error">Назва помешкання не може бути пустою</string>
 </resources>

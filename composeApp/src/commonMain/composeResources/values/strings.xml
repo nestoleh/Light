@@ -1,6 +1,7 @@
 <resources>
-    <string name="button_switch">Switch</string>
-    <string name="label_light_status">Light is\n%1$s</string>
-    <string name="label_status_on">ON</string>
-    <string name="label_status_off">OFF</string>
+    <string name="button_add_home">Add place</string>
+    <string name="add_home_title">Add place</string>
+    <string name="field_home_name">Name</string>
+    <string name="button_save">Save</string>
+    <string name="validator_home_name_empty_error">Place name should not be empty</string>
 </resources>

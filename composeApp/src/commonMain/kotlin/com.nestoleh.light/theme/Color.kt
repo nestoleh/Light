@@ -7,7 +7,6 @@ object LightAppColors {
     val bulbOff = Color(0xFFFFFDDF)
 
     // THEME COLORS
-
     // light
     val primaryLight = Color(0xFF6D5E0F)
     val onPrimaryLight = Color(0xFFFFFFFF)
