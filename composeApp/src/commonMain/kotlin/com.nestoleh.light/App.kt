@@ -4,14 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.nestoleh.light.presentation.home.AddNewHomeScreen
 import com.nestoleh.light.presentation.main.MainScreen
+import com.nestoleh.light.presentation.place.AddPlaceScreen
 import com.nestoleh.light.theme.LightAppTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 
 @Composable
-@Preview
 fun App() {
     LightAppTheme {
         KoinContext {
@@ -22,13 +20,21 @@ fun App() {
             ) {
                 composable(Route.Main.route) {
                     MainScreen(
-                        onAddNewHome = {
-                            navController.navigate(Route.AddNewHome.route)
+                        onAddNewPlace = {
+                            navController.navigate(Route.AddNewHome.route) {
+
+                            }
                         }
                     )
                 }
                 composable(Route.AddNewHome.route) {
-                    AddNewHomeScreen(
+                    AddPlaceScreen(
+                        onPlaceAdded = {
+                            navController.navigate(Route.Main.route) {
+                                popUpTo(Route.Main.route)
+                                launchSingleTop = true
+                            }
+                        },
                         onBack = { navController.popBackStack() }
                     )
                 }

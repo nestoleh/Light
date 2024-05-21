@@ -13,7 +13,10 @@ actual class KoinInitializer(
             androidContext(context)
             androidLogger()
             modules(
-                appModule,
+                dispatcherModule,
+                databaseModule,
+                datasourceModule,
+                repositoryModule,
                 viewModelModule
             )
         }

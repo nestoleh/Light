@@ -1,4 +1,4 @@
-package com.nestoleh.light.presentation.home
+package com.nestoleh.light.presentation.place
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,55 +11,81 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.nestoleh.light.theme.components.LockedProgressButton
 import com.nestoleh.light.theme.components.ToolbarIcon
 import com.nestoleh.light.theme.components.ToolbarTitle
 import com.nestoleh.light.util.koinViewModel
 import light.composeapp.generated.resources.Res
-import light.composeapp.generated.resources.add_home_title
-import light.composeapp.generated.resources.field_home_name
+import light.composeapp.generated.resources.add_place_title
+import light.composeapp.generated.resources.field_place_name
 import light.composeapp.generated.resources.ic_close
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 
 @Composable
-fun AddNewHomeScreen(
-    viewModel: AddHomeViewModel = koinViewModel(),
+fun AddPlaceScreen(
+    viewModel: AddPlaceViewModel = koinViewModel(),
+    onPlaceAdded: () -> Unit,
     onBack: () -> Unit
 ) {
     val state = viewModel.state.collectAsState()
-    AddNewHomeScreenContent(
+    LaunchedEffect(state.value.isSaved) {
+        if (state.value.isSaved) {
+            onPlaceAdded()
+        }
+    }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner.lifecycle) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.errorEventsFlow.collect { message ->
+                snackbarHostState.showSnackbar(message)
+            }
+        }
+    }
+    AddPlaceScreenContent(
         state = state,
+        snackbarHostState = snackbarHostState,
         onAction = { viewModel.onAction(it) },
         onBack = onBack
     )
 }
 
 @Composable
-fun AddNewHomeScreenContent(
-    state: State<AddHomeState>,
-    onAction: (AddHomeAction) -> Unit,
-    onBack: () -> Unit
+fun AddPlaceScreenContent(
+    state: State<AddPlaceState>,
+    onAction: (AddPlaceAction) -> Unit,
+    onBack: () -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
                     ToolbarTitle(
                         modifier = Modifier.padding(end = 48.dp),
-                        title = stringResource(Res.string.add_home_title)
+                        title = stringResource(Res.string.add_place_title)
                     )
                 },
                 navigationIcon = {
@@ -80,22 +106,26 @@ fun AddNewHomeScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            HomeNameField(
+            PlaceNameField(
                 name = state.value.name,
                 nameError = state.value.nameError,
-                onValueChanged = { onAction(AddHomeAction.NameChanged(it)) }
+                onValueChanged = { onAction(AddPlaceAction.NameChanged(it)) }
             )
             Spacer(modifier = Modifier.weight(1f))
+            val keyboardController = LocalSoftwareKeyboardController.current
             LockedProgressButton(
                 isInProgress = state.value.isSaving,
-                onClick = { onAction(AddHomeAction.Save) }
+                onClick = {
+                    keyboardController?.hide()
+                    onAction(AddPlaceAction.Save)
+                }
             )
         }
     }
 }
 
 @Composable
-private fun HomeNameField(
+private fun PlaceNameField(
     name: String,
     nameError: String?,
     onValueChanged: (value: String) -> Unit
@@ -105,9 +135,13 @@ private fun HomeNameField(
             .widthIn(max = 400.dp)
             .fillMaxWidth(),
         value = name,
-        onValueChange = { onValueChanged(it) },
+        onValueChange = {
+            if (it.length <= 50) {
+                onValueChanged(it)
+            }
+        },
         label = {
-            Text(stringResource(Res.string.field_home_name))
+            Text(stringResource(Res.string.field_place_name))
         },
         isError = !nameError.isNullOrEmpty(),
         singleLine = true,
@@ -119,7 +153,7 @@ private fun HomeNameField(
             if (!nameError.isNullOrEmpty()) {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = nameError ?: "",
+                    text = nameError,
                     color = MaterialTheme.colorScheme.error
                 )
             }

@@ -1,7 +1,8 @@
 <resources>
-    <string name="button_add_home">Додати помешкання</string>
-    <string name="add_home_title">Додати помешкання</string>
-    <string name="field_home_name">Назва</string>
+    <string name="button_add_place">Додати помешкання</string>
+    <string name="add_place_title">Додати помешкання</string>
+    <string name="field_place_name">Назва</string>
     <string name="button_save">Зберегти</string>
-    <string name="validator_home_name_empty_error">Назва помешкання не може бути пустою</string>
+    <string name="validator_place_name_empty_error">Назва помешкання не може бути пустою</string>
+    <string name="validator_place_name_exist_error">У Вас уже є помешкання з такою назвою, будь ласка, вкажіть іншу назву</string>
 </resources>

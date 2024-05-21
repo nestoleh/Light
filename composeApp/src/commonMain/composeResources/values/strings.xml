@@ -1,7 +1,8 @@
 <resources>
-    <string name="button_add_home">Add place</string>
-    <string name="add_home_title">Add place</string>
-    <string name="field_home_name">Name</string>
+    <string name="button_add_place">Add place</string>
+    <string name="add_place_title">Add place</string>
+    <string name="field_place_name">Name</string>
     <string name="button_save">Save</string>
-    <string name="validator_home_name_empty_error">Place name should not be empty</string>
+    <string name="validator_place_name_empty_error">Place name should not be empty</string>
+    <string name="validator_place_name_exist_error">You already have place with this name, please enter another name</string>
 </resources>

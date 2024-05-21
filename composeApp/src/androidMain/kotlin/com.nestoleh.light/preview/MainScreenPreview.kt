@@ -10,7 +10,8 @@ import com.nestoleh.light.theme.LightAppTheme
 fun MainScreenPreview() {
     LightAppTheme {
         MainScreenContent(
-            onAddNewHome = {}
+            onAddNewPlace = {},
+            places = emptyList()
         )
     }
 }

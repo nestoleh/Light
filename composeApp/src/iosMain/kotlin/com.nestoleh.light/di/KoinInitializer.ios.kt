@@ -6,7 +6,10 @@ actual class KoinInitializer {
     actual fun init() {
         startKoin {
             modules(
-                appModule,
+                dispatcherModule,
+                databaseModule,
+                datasourceModule,
+                repositoryModule,
                 viewModelModule
             )
         }

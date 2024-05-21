@@ -4,14 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
-import com.nestoleh.light.presentation.home.AddHomeState
-import com.nestoleh.light.presentation.home.AddNewHomeScreenContent
+import com.nestoleh.light.presentation.place.AddPlaceScreenContent
+import com.nestoleh.light.presentation.place.AddPlaceState
 
 @Composable
 @Preview
-fun AddNewHomeScreenPreview() {
-    AddNewHomeScreenContent(
-        state = remember { mutableStateOf(AddHomeState()) },
+fun AddPlaceScreenPreview() {
+    AddPlaceScreenContent(
+        state = remember { mutableStateOf(AddPlaceState()) },
         onAction = {},
         onBack = {}
     )
