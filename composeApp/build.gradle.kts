@@ -31,6 +31,7 @@ kotlin {
             languageSettings {
                 optIn("androidx.compose.material3.ExperimentalMaterial3Api")
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
 

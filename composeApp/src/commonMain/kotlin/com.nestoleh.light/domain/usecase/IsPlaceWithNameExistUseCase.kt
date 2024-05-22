@@ -1,5 +1,6 @@
 package com.nestoleh.light.domain.usecase
 
+import com.nestoleh.light.core.domain.usecase.ResultUseCase
 import com.nestoleh.light.data.database.dao.PlaceDao
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

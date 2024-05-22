@@ -10,8 +10,10 @@ import com.nestoleh.light.theme.LightAppTheme
 fun MainScreenPreview() {
     LightAppTheme {
         MainScreenContent(
+            places = emptyList(),
             onAddNewPlace = {},
-            places = emptyList()
+            currentPlace = null,
+            onSelectPlace = {}
         )
     }
 }

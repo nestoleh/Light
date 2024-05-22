@@ -1,4 +1,4 @@
-package com.nestoleh.light.domain.usecase
+package com.nestoleh.light.core.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
 

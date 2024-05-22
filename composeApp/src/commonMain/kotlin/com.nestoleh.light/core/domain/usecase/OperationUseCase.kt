@@ -1,9 +1,9 @@
-package com.nestoleh.light.domain.usecase
+package com.nestoleh.light.core.domain.usecase
 
-import com.nestoleh.light.domain.model.OperationError
-import com.nestoleh.light.domain.model.OperationStarted
-import com.nestoleh.light.domain.model.OperationStatus
-import com.nestoleh.light.domain.model.OperationSuccess
+import com.nestoleh.light.core.domain.model.OperationError
+import com.nestoleh.light.core.domain.model.OperationStarted
+import com.nestoleh.light.core.domain.model.OperationStatus
+import com.nestoleh.light.core.domain.model.OperationSuccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
