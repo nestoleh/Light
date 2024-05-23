@@ -21,18 +21,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.Place
-import com.nestoleh.light.theme.components.LockedProgressButton
-import com.nestoleh.light.theme.components.ToolbarIcon
-import com.nestoleh.light.theme.components.ToolbarTitle
+import com.nestoleh.light.presentation.components.LockedProgressButton
+import com.nestoleh.light.presentation.components.ToolbarIcon
+import com.nestoleh.light.presentation.components.ToolbarTitle
 import com.nestoleh.light.util.HandleErrorsFlow
 import com.nestoleh.light.util.koinViewModel
+import kotlinx.coroutines.launch
 import light.composeapp.generated.resources.Res
 import light.composeapp.generated.resources.add_place_title
 import light.composeapp.generated.resources.field_place_name
@@ -113,10 +116,13 @@ fun AddPlaceScreenContent(
             )
             Spacer(modifier = Modifier.weight(1f))
             val keyboardController = LocalSoftwareKeyboardController.current
+            val scope = rememberCoroutineScope()
             LockedProgressButton(
                 isInProgress = state.value.isSaving,
                 onClick = {
-                    keyboardController?.hide()
+                    scope.launch {
+                        keyboardController?.hide()
+                    }
                     onAction(AddPlaceAction.Save)
                 }
             )
@@ -147,6 +153,7 @@ private fun PlaceNameField(
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
+            capitalization = KeyboardCapitalization.Words,
             imeAction = ImeAction.Done
         ),
         supportingText = {

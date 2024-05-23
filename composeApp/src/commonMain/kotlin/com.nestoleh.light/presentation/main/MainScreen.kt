@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.Place
-import com.nestoleh.light.theme.components.ToolbarIcon
+import com.nestoleh.light.presentation.components.ToolbarIcon
 import com.nestoleh.light.util.koinViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -127,7 +127,7 @@ fun MainScreenContent(
                 val yOffset = animateDpAsState(
                     targetValue = if (openPlaces) (150).dp else 0.dp,
                     animationSpec = tween(
-                        durationMillis = 300,
+                        durationMillis = 200,
                         easing = EaseInOut
                     )
                 )

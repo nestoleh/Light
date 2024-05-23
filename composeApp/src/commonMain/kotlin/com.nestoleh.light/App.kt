@@ -14,7 +14,7 @@ import com.nestoleh.light.Route.HomeSettings.parseId
 import com.nestoleh.light.presentation.main.MainScreen
 import com.nestoleh.light.presentation.place.add.AddPlaceScreen
 import com.nestoleh.light.presentation.place.settings.PlaceSettingsScreen
-import com.nestoleh.light.theme.LightAppTheme
+import com.nestoleh.light.presentation.theme.LightAppTheme
 import org.koin.compose.KoinContext
 
 @Composable

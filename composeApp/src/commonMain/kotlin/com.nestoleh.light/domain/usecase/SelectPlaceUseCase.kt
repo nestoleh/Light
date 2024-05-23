@@ -1,29 +1,23 @@
 package com.nestoleh.light.domain.usecase
 
 import com.nestoleh.light.core.domain.usecase.OperationUseCase
-import com.nestoleh.light.data.database.dao.ParametersDao
-import com.nestoleh.light.data.database.dao.PlaceDao
-import com.nestoleh.light.data.database.entity.ParameterEntity
 import com.nestoleh.light.domain.ParametersKeys
+import com.nestoleh.light.domain.repository.ParametersRepository
+import com.nestoleh.light.domain.repository.PlaceRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
 class SelectPlaceUseCase(
-    private val placeDao: PlaceDao,
-    private val parametersDao: ParametersDao,
+    private val placeRepository: PlaceRepository,
+    private val parametersRepository: ParametersRepository,
     private val dispatcher: CoroutineDispatcher
 ) : OperationUseCase<SelectPlaceUseCase.Parameters>() {
 
     override suspend fun runOperation(params: Parameters) = withContext(dispatcher) {
-        val isPlaceExist = placeDao.getPlaceFlow(params.placeId).firstOrNull() != null
+        val isPlaceExist = placeRepository.getPlaceAsFlow(params.placeId).firstOrNull() != null
         if (isPlaceExist) {
-            parametersDao.upsertParameter(
-                ParameterEntity(
-                    key = ParametersKeys.SELECTED_PLACE_ID,
-                    value = params.placeId.toString()
-                )
-            )
+            parametersRepository.putInt(ParametersKeys.SELECTED_PLACE_ID, params.placeId)
         } else {
             throw IllegalArgumentException("Place with id ${params.placeId} does not exist")
         }

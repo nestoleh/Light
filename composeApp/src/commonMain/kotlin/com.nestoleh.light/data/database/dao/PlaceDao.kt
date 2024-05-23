@@ -4,31 +4,33 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.nestoleh.light.data.database.entity.PlaceEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlaceDao {
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPlace(place: PlaceEntity): Long
+
+    @Update
+    suspend fun updatePlace(place: PlaceEntity)
+
     @Query("SELECT * FROM Place")
-    fun getAllPlacesFlow(): Flow<List<PlaceEntity>>
+    fun getAllPlacesAsFlow(): Flow<List<PlaceEntity>>
 
-    @Query("SELECT * FROM Place WHERE id = :placeId LIMIT 1")
-    fun getPlaceFlow(placeId: Int): Flow<PlaceEntity?>
-
-    @Query("SELECT * FROM Place WHERE id = :placeId LIMIT 1")
-    suspend fun getPlace(placeId: Int): PlaceEntity
+    @Query("SELECT * FROM Place")
+    suspend fun getAllPlaces(): List<PlaceEntity>
 
     @Query("SELECT * FROM Place WHERE name = :name")
     suspend fun getAllPlacesWithName(name: String): List<PlaceEntity>
 
-    suspend fun insert(place: PlaceEntity): PlaceEntity {
-        val id = insertPlace(place)
-        return place.copy(id = id.toInt())
-    }
+    @Query("SELECT * FROM Place WHERE id = :placeId LIMIT 1")
+    fun getPlaceAsFlow(placeId: Int): Flow<PlaceEntity?>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPlace(place: PlaceEntity): Long
+    @Query("SELECT * FROM Place WHERE id = :placeId LIMIT 1")
+    suspend fun getPlace(placeId: Int): PlaceEntity?
 
     @Query("DELETE FROM Place WHERE id = :placeId")
     suspend fun delete(placeId: Int)

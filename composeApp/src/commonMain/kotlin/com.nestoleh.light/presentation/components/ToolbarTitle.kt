@@ -1,4 +1,4 @@
-package com.nestoleh.light.theme.components
+package com.nestoleh.light.presentation.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth

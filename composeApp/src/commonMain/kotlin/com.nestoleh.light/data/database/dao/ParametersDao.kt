@@ -12,7 +12,7 @@ interface ParametersDao {
     suspend fun upsertParameter(parameter: ParameterEntity)
 
     @Query("SELECT * FROM ParameterEntity WHERE \"key\" = :key")
-    fun getParameter(key: String): Flow<ParameterEntity?>
+    fun getParameterAsFlow(key: String): Flow<ParameterEntity?>
 
     @Query("SELECT * FROM ParameterEntity WHERE \"key\" = :key")
     suspend fun getParameterValue(key: String): ParameterEntity?

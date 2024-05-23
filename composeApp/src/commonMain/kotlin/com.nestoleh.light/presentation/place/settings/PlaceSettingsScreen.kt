@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.Place
-import com.nestoleh.light.theme.components.ToolbarIcon
-import com.nestoleh.light.theme.components.ToolbarTitle
+import com.nestoleh.light.presentation.components.ToolbarIcon
+import com.nestoleh.light.presentation.components.ToolbarTitle
 import com.nestoleh.light.util.HandleErrorsFlow
 import com.nestoleh.light.util.koinViewModel
 import light.composeapp.generated.resources.Res

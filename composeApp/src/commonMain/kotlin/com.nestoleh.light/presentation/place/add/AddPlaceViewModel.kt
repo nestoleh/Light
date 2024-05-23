@@ -69,7 +69,7 @@ class AddPlaceViewModel(
         viewModelScope.launch {
             createPlaceUseCase(
                 CreatePlaceUseCase.Parameters(
-                    placeName = name
+                    Place(name = name)
                 )
             ).catch {
                 Logger.e(it) { "Ann error occurred when trying to add new place" }

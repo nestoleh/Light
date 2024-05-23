@@ -1,4 +1,4 @@
-package com.nestoleh.light.theme
+package com.nestoleh.light.presentation.theme
 
 import android.app.Activity
 import androidx.compose.runtime.Composable

@@ -1,5 +1,9 @@
 package com.nestoleh.light.di
 
+import com.nestoleh.light.data.repository.ParametersDbRepository
+import com.nestoleh.light.data.repository.PlaceDbRepository
+import com.nestoleh.light.domain.repository.ParametersRepository
+import com.nestoleh.light.domain.repository.PlaceRepository
 import com.nestoleh.light.domain.usecase.CreatePlaceUseCase
 import com.nestoleh.light.domain.usecase.DeletePlaceUseCase
 import com.nestoleh.light.domain.usecase.GetAllPlacesUseCase
@@ -12,39 +16,49 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val repositoryModule = module {
+    single<ParametersRepository> {
+        ParametersDbRepository(
+            dao = get()
+        )
+    }
+    single<PlaceRepository> {
+        PlaceDbRepository(
+            dao = get()
+        )
+    }
     single {
         CreatePlaceUseCase(
-            placeDao = get(),
+            placeRepository = get(),
             dispatcher = get(DispatcherQualifier.IO.qualifier)
         )
     }
     singleOf(::GetAllPlacesUseCase)
     single {
         IsPlaceWithNameExistUseCase(
-            placeDao = get(),
+            placeRepository = get(),
             dispatcher = get(DispatcherQualifier.IO.qualifier)
         )
     }
     singleOf(::PlaceNameValidator)
     single {
         GetSelectedPlaceUseCase(
-            placeDao = get(),
-            parametersDao = get(),
+            placeRepository = get(),
+            parametersRepository = get(),
             dispatcher = get(DispatcherQualifier.IO.qualifier)
         )
     }
     single {
         SelectPlaceUseCase(
-            placeDao = get(),
-            parametersDao = get(),
+            placeRepository = get(),
+            parametersRepository = get(),
             dispatcher = get(DispatcherQualifier.IO.qualifier)
         )
     }
     singleOf(::GetPlaceUseCase)
     single {
         DeletePlaceUseCase(
-            placeDao = get(),
-            parametersDao = get(),
+            placeRepository = get(),
+            parametersRepository = get(),
             dispatcher = get(DispatcherQualifier.IO.qualifier)
         )
     }
