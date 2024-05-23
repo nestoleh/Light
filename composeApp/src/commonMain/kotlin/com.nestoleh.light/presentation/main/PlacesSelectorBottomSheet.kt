@@ -13,6 +13,7 @@ import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,21 +23,23 @@ import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.Place
 import light.composeapp.generated.resources.Res
 import light.composeapp.generated.resources.button_add_place
-import light.composeapp.generated.resources.ic_close
+import light.composeapp.generated.resources.ic_check
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PlacesSelectorBottomSheet(
     modifier: Modifier = Modifier,
+    sheetState: SheetState,
     selectedPlace: Place?,
     allPlaces: List<Place>,
     onPlaceSelected: (Place) -> Unit,
     onAddNewPlace: () -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
         windowInsets = BottomSheetDefaults.windowInsets.only(WindowInsetsSides.Bottom),
     ) {
         LazyColumn(
@@ -63,7 +66,7 @@ fun PlacesSelectorBottomSheet(
                     )
                     if (it.id == selectedPlace?.id) {
                         Icon(
-                            painter = painterResource(Res.drawable.ic_close),
+                            painter = painterResource(Res.drawable.ic_check),
                             contentDescription = "Selected item icon"
                         )
                     }

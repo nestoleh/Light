@@ -4,6 +4,8 @@ import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,8 +22,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,18 +39,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.Place
+import com.nestoleh.light.theme.components.ToolbarIcon
 import com.nestoleh.light.util.koinViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import light.composeapp.generated.resources.Res
 import light.composeapp.generated.resources.button_add_place
 import light.composeapp.generated.resources.ic_down
+import light.composeapp.generated.resources.ic_settings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = koinViewModel(),
-    onAddNewPlace: () -> Unit
+    onAddNewPlace: () -> Unit,
+    onOpenPlaceSettings: (Place) -> Unit
 ) {
     val currentPlace by viewModel.currentPlaceFlow.collectAsState()
     val allPlaces by viewModel.placesFlow.collectAsState()
@@ -54,7 +62,8 @@ fun MainScreen(
         currentPlace = currentPlace,
         places = allPlaces,
         onAddNewPlace = onAddNewPlace,
-        onSelectPlace = { place -> viewModel.selectPlace(place) }
+        onSelectPlace = { place -> viewModel.selectPlace(place) },
+        onOpenPlaceSettings = onOpenPlaceSettings
     )
 }
 
@@ -63,12 +72,43 @@ fun MainScreenContent(
     currentPlace: Place?,
     places: List<Place>,
     onAddNewPlace: () -> Unit,
-    onSelectPlace: (Place) -> Unit
+    onSelectPlace: (Place) -> Unit,
+    onOpenPlaceSettings: (Place) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
+    var openPlaces by rememberSaveable { mutableStateOf(false) }
     var showPlacesBottomSheet by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(openPlaces) {
+        if (openPlaces) {
+            scope.launch {
+                delay(200)
+                showPlacesBottomSheet = true
+            }
+        }
+    }
+    LaunchedEffect(showPlacesBottomSheet) {
+        if (!showPlacesBottomSheet) {
+            openPlaces = false
+        }
+    }
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {},
+                actions = {
+                    ToolbarIcon(
+                        painter = painterResource(Res.drawable.ic_settings),
+                        onClick = {
+                            if (currentPlace != null) {
+                                onOpenPlaceSettings(currentPlace)
+                            }
+                        },
+                        contentDescription = "Place settings"
+                    )
+                }
+            )
+        },
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
             if (currentPlace == null) {
@@ -85,7 +125,7 @@ fun MainScreenContent(
                 }
             } else {
                 val yOffset = animateDpAsState(
-                    targetValue = if (showPlacesBottomSheet) (150).dp else 0.dp,
+                    targetValue = if (openPlaces) (150).dp else 0.dp,
                     animationSpec = tween(
                         durationMillis = 300,
                         easing = EaseInOut
@@ -97,7 +137,7 @@ fun MainScreenContent(
                         .padding(bottom = 48.dp)
                         .height(54.dp)
                         .width(250.dp),
-                    onClick = { showPlacesBottomSheet = true }
+                    onClick = { openPlaces = true }
                 ) {
                     Row(
                         modifier = Modifier
@@ -130,34 +170,49 @@ fun MainScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 102.dp),
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (currentPlace == null) {
-                Text(text = "You don't have any places yet. \nAdd a new one!")
-            } else {
-                Text(text = "Selected place:\n${currentPlace.name}")
+            Box(
+                modifier = Modifier
+                    .padding(16.dp)
+            ) {
+                if (currentPlace == null) {
+                    Text(
+                        text = "You don't have any places yet. \nAdd a new one!",
+                        textAlign = TextAlign.Center
+                    )
+                } else {
+                    Text(
+                        text = "Selected place:\n${currentPlace.name}",
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
 
         if (showPlacesBottomSheet) {
             PlacesSelectorBottomSheet(
+                sheetState = sheetState,
                 selectedPlace = currentPlace,
                 allPlaces = places,
                 onPlaceSelected = { place ->
                     onSelectPlace(place)
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            showPlacesBottomSheet = false
+                    scope.launch { sheetState.hide() }
+                        .invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showPlacesBottomSheet = false
+                            }
                         }
-                    }
                 },
                 onAddNewPlace = {
-                    onAddNewPlace()
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            showPlacesBottomSheet = false
+                    scope.launch { sheetState.hide() }
+                        .invokeOnCompletion {
+                            onAddNewPlace()
+                            if (!sheetState.isVisible) {
+                                showPlacesBottomSheet = false
+                            }
                         }
-                    }
                 },
                 onDismissRequest = { showPlacesBottomSheet = false }
             )

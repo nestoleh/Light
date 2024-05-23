@@ -1,7 +1,9 @@
 package com.nestoleh.light.di
 
 import com.nestoleh.light.domain.usecase.CreatePlaceUseCase
+import com.nestoleh.light.domain.usecase.DeletePlaceUseCase
 import com.nestoleh.light.domain.usecase.GetAllPlacesUseCase
+import com.nestoleh.light.domain.usecase.GetPlaceUseCase
 import com.nestoleh.light.domain.usecase.GetSelectedPlaceUseCase
 import com.nestoleh.light.domain.usecase.IsPlaceWithNameExistUseCase
 import com.nestoleh.light.domain.usecase.SelectPlaceUseCase
@@ -33,6 +35,14 @@ val repositoryModule = module {
     }
     single {
         SelectPlaceUseCase(
+            placeDao = get(),
+            parametersDao = get(),
+            dispatcher = get(DispatcherQualifier.IO.qualifier)
+        )
+    }
+    singleOf(::GetPlaceUseCase)
+    single {
+        DeletePlaceUseCase(
             placeDao = get(),
             parametersDao = get(),
             dispatcher = get(DispatcherQualifier.IO.qualifier)

@@ -13,4 +13,10 @@ interface ParametersDao {
 
     @Query("SELECT * FROM ParameterEntity WHERE \"key\" = :key")
     fun getParameter(key: String): Flow<ParameterEntity?>
+
+    @Query("SELECT * FROM ParameterEntity WHERE \"key\" = :key")
+    suspend fun getParameterValue(key: String): ParameterEntity?
+
+    @Query("DELETE FROM ParameterEntity WHERE \"key\" = :key")
+    suspend fun deleteParameter(key: String)
 }

@@ -103,5 +103,6 @@ room {
 }
 
 dependencies {
+    implementation(libs.transportation.consumer)
     ksp(libs.room.compiler)
 }

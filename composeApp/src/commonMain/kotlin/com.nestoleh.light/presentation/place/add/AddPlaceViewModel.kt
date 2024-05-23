@@ -1,9 +1,10 @@
-package com.nestoleh.light.presentation.place
+package com.nestoleh.light.presentation.place.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.nestoleh.light.core.domain.model.OperationError
+import com.nestoleh.light.domain.model.Place
 import com.nestoleh.light.domain.usecase.CreatePlaceUseCase
 import com.nestoleh.light.domain.usecase.SelectPlaceUseCase
 import com.nestoleh.light.domain.validator.PlaceNameValidator
@@ -12,7 +13,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -73,22 +77,23 @@ class AddPlaceViewModel(
                 _state.value = _state.value.copy(
                     isSaving = false
                 )
-            }.flatMapConcat { place ->
+            }.flatMapLatest { place ->
                 selectedPlaceUseCase(
                     SelectPlaceUseCase.Parameters(
                         placeId = place.id
                     )
+                ).filter { it.isTerminate }
+                    .onEach {
+                        if (it is OperationError) {
+                            Logger.e(it.throwable) { "An error occurred when trying to select new place" }
+                        }
+                    }
+                    .map { place }
+            }.collect { newPlace ->
+                _state.value = _state.value.copy(
+                    isSaving = false,
+                    savedPlace = newPlace
                 )
-            }.collect {
-                if (it is OperationError) {
-                    Logger.e(it.throwable) { "An error occurred when trying to select new place" }
-                }
-                if (it.isTerminate) {
-                    _state.value = _state.value.copy(
-                        isSaving = false,
-                        isSaved = true
-                    )
-                }
             }
         }
     }
@@ -98,7 +103,7 @@ data class AddPlaceState(
     val name: String = "",
     val nameError: String? = null,
     val isSaving: Boolean = false,
-    val isSaved: Boolean = false
+    val savedPlace: Place? = null,
 )
 
 sealed interface AddPlaceAction {

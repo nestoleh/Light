@@ -4,12 +4,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import co.touchlab.kermit.Logger
+import androidx.navigation.navArgument
+import com.nestoleh.light.Route.HomeSettings.parseId
 import com.nestoleh.light.presentation.main.MainScreen
-import com.nestoleh.light.presentation.place.AddPlaceScreen
+import com.nestoleh.light.presentation.place.add.AddPlaceScreen
+import com.nestoleh.light.presentation.place.settings.PlaceSettingsScreen
 import com.nestoleh.light.theme.LightAppTheme
 import org.koin.compose.KoinContext
 
@@ -28,24 +32,41 @@ fun App() {
                     MainScreen(
                         onAddNewPlace = {
                             navController.navigate(Route.AddNewHome.route)
+                        },
+                        onOpenPlaceSettings = {
+                            navController.navigate(
+                                Route.HomeSettings.createRoute(id = it.id)
+                            )
                         }
                     )
                 }
                 composable(Route.AddNewHome.route) {
                     AddPlaceScreen(
-                        onPlaceAdded = {
-                            Logger.d("back stack size = ${navController.currentBackStack.value.size}")
-                            if (navController.currentBackStack.value.size > 1) {
-                                navController.popBackStack()
-                            } else {
-                                navController.navigate(Route.Main.route) {
-                                    popUpTo(Route.Main.route)
-                                    launchSingleTop = true
-                                }
+                        onPlaceAdded = { place ->
+                            navController.navigate(Route.HomeSettings.createRoute(place.id)) {
+                                popUpTo(Route.Main.route)
+                                launchSingleTop = true
                             }
                         },
                         onBack = { navController.popBackStack() }
                     )
+                }
+                composable(
+                    route = Route.HomeSettings.route,
+                    arguments = Route.HomeSettings.arguments
+                ) {
+                    val id = it.parseId()
+                    if (id == null) {
+                        navController.navigate(Route.Main.route) {
+                            popUpTo(Route.Main.route)
+                            launchSingleTop = true
+                        }
+                    } else {
+                        PlaceSettingsScreen(
+                            id = id,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
                 }
             }
         }
@@ -55,4 +76,13 @@ fun App() {
 sealed class Route(val route: String) {
     data object Main : Route("main")
     data object AddNewHome : Route("addHome")
+    data object HomeSettings : Route("homeSettings/{id}") {
+        val arguments = listOf(
+            navArgument("id") { type = NavType.IntType }
+        )
+
+        fun createRoute(id: Int) = "homeSettings/$id"
+
+        fun NavBackStackEntry.parseId() = arguments?.getInt("id")
+    }
 }

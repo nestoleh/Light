@@ -1,4 +1,4 @@
-package com.nestoleh.light.presentation.place
+package com.nestoleh.light.presentation.place.add
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,16 +23,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
+import com.nestoleh.light.domain.model.Place
 import com.nestoleh.light.theme.components.LockedProgressButton
 import com.nestoleh.light.theme.components.ToolbarIcon
 import com.nestoleh.light.theme.components.ToolbarTitle
+import com.nestoleh.light.util.HandleErrorsFlow
 import com.nestoleh.light.util.koinViewModel
 import light.composeapp.generated.resources.Res
 import light.composeapp.generated.resources.add_place_title
@@ -45,30 +44,31 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun AddPlaceScreen(
     viewModel: AddPlaceViewModel = koinViewModel(),
-    onPlaceAdded: () -> Unit,
+    onPlaceAdded: (place: Place) -> Unit,
     onBack: () -> Unit
 ) {
     val state = viewModel.state.collectAsState()
-    LaunchedEffect(state.value.isSaved) {
-        if (state.value.isSaved) {
-            onPlaceAdded()
-        }
-    }
+    HandlePlaceAdded(state, onPlaceAdded)
     val snackbarHostState = remember { SnackbarHostState() }
-    val lifecycleOwner = LocalLifecycleOwner.current
-    LaunchedEffect(lifecycleOwner.lifecycle) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.errorEventsFlow.collect { message ->
-                snackbarHostState.showSnackbar(message)
-            }
-        }
-    }
+    HandleErrorsFlow(viewModel.errorEventsFlow, snackbarHostState)
     AddPlaceScreenContent(
         state = state,
         snackbarHostState = snackbarHostState,
         onAction = { viewModel.onAction(it) },
         onBack = onBack
     )
+}
+
+@Composable
+private inline fun HandlePlaceAdded(
+    state: State<AddPlaceState>,
+    noinline onPlaceAdded: (place: Place) -> Unit
+) {
+    LaunchedEffect(state.value.savedPlace) {
+        state.value.savedPlace?.let {
+            onPlaceAdded(it)
+        }
+    }
 }
 
 @Composable
