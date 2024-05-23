@@ -47,11 +47,11 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun AddPlaceScreen(
     viewModel: AddPlaceViewModel = koinViewModel(),
-    onPlaceAdded: (place: Place) -> Unit,
+    onNavigateToPlaceSettings: (place: Place) -> Unit,
     onBack: () -> Unit
 ) {
     val state = viewModel.state.collectAsState()
-    HandlePlaceAdded(state, onPlaceAdded)
+    HandlePlaceAdded(state, onNavigateToPlaceSettings)
     val snackbarHostState = remember { SnackbarHostState() }
     HandleErrorsFlow(viewModel.errorEventsFlow, snackbarHostState)
     AddPlaceScreenContent(
@@ -64,7 +64,7 @@ fun AddPlaceScreen(
 
 @Composable
 private inline fun HandlePlaceAdded(
-    state: State<AddPlaceState>,
+    state: State<AddPlaceUIState>,
     noinline onPlaceAdded: (place: Place) -> Unit
 ) {
     LaunchedEffect(state.value.savedPlace) {
@@ -76,7 +76,7 @@ private inline fun HandlePlaceAdded(
 
 @Composable
 fun AddPlaceScreenContent(
-    state: State<AddPlaceState>,
+    state: State<AddPlaceUIState>,
     onAction: (AddPlaceAction) -> Unit,
     onBack: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },

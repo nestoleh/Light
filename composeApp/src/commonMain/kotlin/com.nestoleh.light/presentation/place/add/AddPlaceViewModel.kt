@@ -26,7 +26,7 @@ class AddPlaceViewModel(
     private val selectedPlaceUseCase: SelectPlaceUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(AddPlaceState())
+    private val _state = MutableStateFlow(AddPlaceUIState())
     val state = _state.asStateFlow()
 
     private val errorEventsChannel = Channel<String>()
@@ -97,16 +97,4 @@ class AddPlaceViewModel(
             }
         }
     }
-}
-
-data class AddPlaceState(
-    val name: String = "",
-    val nameError: String? = null,
-    val isSaving: Boolean = false,
-    val savedPlace: Place? = null,
-)
-
-sealed interface AddPlaceAction {
-    data class NameChanged(val name: String) : AddPlaceAction
-    data object Save : AddPlaceAction
 }

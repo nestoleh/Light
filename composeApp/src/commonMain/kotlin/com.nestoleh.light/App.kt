@@ -30,10 +30,10 @@ fun App() {
             ) {
                 composable(Route.Main.route) {
                     MainScreen(
-                        onAddNewPlace = {
+                        onNavigateToAddPLace = {
                             navController.navigate(Route.AddNewHome.route)
                         },
-                        onOpenPlaceSettings = {
+                        onNavigateToPlaceSettings = {
                             navController.navigate(
                                 Route.HomeSettings.createRoute(id = it.id)
                             )
@@ -42,7 +42,7 @@ fun App() {
                 }
                 composable(Route.AddNewHome.route) {
                     AddPlaceScreen(
-                        onPlaceAdded = { place ->
+                        onNavigateToPlaceSettings = { place ->
                             navController.navigate(Route.HomeSettings.createRoute(place.id)) {
                                 popUpTo(Route.Main.route)
                                 launchSingleTop = true

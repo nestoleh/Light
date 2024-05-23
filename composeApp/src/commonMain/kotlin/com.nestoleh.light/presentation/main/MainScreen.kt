@@ -53,26 +53,25 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = koinViewModel(),
-    onAddNewPlace: () -> Unit,
-    onOpenPlaceSettings: (Place) -> Unit
+    onNavigateToAddPLace: () -> Unit,
+    onNavigateToPlaceSettings: (Place) -> Unit
 ) {
-    val currentPlace by viewModel.currentPlaceFlow.collectAsState()
-    val allPlaces by viewModel.placesFlow.collectAsState()
+    val state by viewModel.state.collectAsState()
     MainScreenContent(
-        currentPlace = currentPlace,
-        places = allPlaces,
-        onAddNewPlace = onAddNewPlace,
-        onSelectPlace = { place -> viewModel.selectPlace(place) },
-        onOpenPlaceSettings = onOpenPlaceSettings
+        selectedPlace = state.selectedPlace,
+        places = state.allPlaces,
+        onAddNewPlace = onNavigateToAddPLace,
+        onOpenPlaceSettings = onNavigateToPlaceSettings,
+        onAction = { viewModel.onAction(it) }
     )
 }
 
 @Composable
 fun MainScreenContent(
-    currentPlace: Place?,
+    selectedPlace: Place?,
     places: List<Place>,
+    onAction: (MainAction) -> Unit,
     onAddNewPlace: () -> Unit,
-    onSelectPlace: (Place) -> Unit,
     onOpenPlaceSettings: (Place) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -100,8 +99,8 @@ fun MainScreenContent(
                     ToolbarIcon(
                         painter = painterResource(Res.drawable.ic_settings),
                         onClick = {
-                            if (currentPlace != null) {
-                                onOpenPlaceSettings(currentPlace)
+                            if (selectedPlace != null) {
+                                onOpenPlaceSettings(selectedPlace)
                             }
                         },
                         contentDescription = "Place settings"
@@ -111,7 +110,7 @@ fun MainScreenContent(
         },
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
-            if (currentPlace == null) {
+            if (selectedPlace == null) {
                 FloatingActionButton(
                     modifier = Modifier
                         .padding(bottom = 48.dp)
@@ -147,7 +146,7 @@ fun MainScreenContent(
                     ) {
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = currentPlace.name,
+                            text = selectedPlace.name,
                             maxLines = 1,
                             textAlign = TextAlign.Center,
                             overflow = TextOverflow.Ellipsis
@@ -177,14 +176,14 @@ fun MainScreenContent(
                 modifier = Modifier
                     .padding(16.dp)
             ) {
-                if (currentPlace == null) {
+                if (selectedPlace == null) {
                     Text(
                         text = "You don't have any places yet. \nAdd a new one!",
                         textAlign = TextAlign.Center
                     )
                 } else {
                     Text(
-                        text = "Selected place:\n${currentPlace.name}",
+                        text = "Selected place:\n${selectedPlace.name}",
                         textAlign = TextAlign.Center
                     )
                 }
@@ -194,10 +193,10 @@ fun MainScreenContent(
         if (showPlacesBottomSheet) {
             PlacesSelectorBottomSheet(
                 sheetState = sheetState,
-                selectedPlace = currentPlace,
+                selectedPlace = selectedPlace,
                 allPlaces = places,
                 onPlaceSelected = { place ->
-                    onSelectPlace(place)
+                    onAction(MainAction.SelectPlace(place))
                     scope.launch { sheetState.hide() }
                         .invokeOnCompletion {
                             if (!sheetState.isVisible) {

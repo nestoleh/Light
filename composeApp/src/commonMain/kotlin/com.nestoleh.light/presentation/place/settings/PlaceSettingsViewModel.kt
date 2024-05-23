@@ -6,7 +6,6 @@ import co.touchlab.kermit.Logger
 import com.nestoleh.light.core.domain.model.OperationError
 import com.nestoleh.light.core.domain.model.OperationStarted
 import com.nestoleh.light.core.domain.model.OperationSuccess
-import com.nestoleh.light.domain.model.Place
 import com.nestoleh.light.domain.usecase.DeletePlaceUseCase
 import com.nestoleh.light.domain.usecase.GetPlaceUseCase
 import kotlinx.coroutines.channels.Channel
@@ -34,7 +33,15 @@ class PlaceSettingsViewModel(
             .launchIn(viewModelScope)
     }
 
-    fun deletePlace() {
+    fun onAction(event: PlaceSettingsAction) {
+        when (event) {
+            is PlaceSettingsAction.DeletePlace -> {
+                deletePlace()
+            }
+        }
+    }
+
+    private fun deletePlace() {
         val place = state.value.place
         if (place != null) {
             deletePlaceUseCase(DeletePlaceUseCase.Parameters(id = place.id))
@@ -58,8 +65,3 @@ class PlaceSettingsViewModel(
     }
 
 }
-
-data class PlaceSettingsUIState(
-    val place: Place? = null,
-    val isDeleted: Boolean = false
-)

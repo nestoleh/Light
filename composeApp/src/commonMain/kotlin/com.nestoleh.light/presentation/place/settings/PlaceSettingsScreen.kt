@@ -46,30 +46,16 @@ fun PlaceSettingsScreen(
     PlaceSettingsScreenContent(
         place = state.value.place,
         snackbarHostState = snackbarHostState,
-        onDelete = {
-            viewModel.deletePlace()
-        },
+        onEvent = { viewModel.onAction(it) },
         onBack = onBack
     )
-}
-
-@Composable
-private inline fun HandleDeleteState(
-    state: State<PlaceSettingsUIState>,
-    noinline onBack: () -> Unit
-) {
-    LaunchedEffect(state.value.isDeleted) {
-        if (state.value.isDeleted) {
-            onBack()
-        }
-    }
 }
 
 @Composable
 fun PlaceSettingsScreenContent(
     place: Place?,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    onDelete: () -> Unit,
+    onEvent: (PlaceSettingsAction) -> Unit,
     onBack: () -> Unit
 ) {
     val showDeleteDialog = remember { mutableStateOf(false) }
@@ -126,10 +112,22 @@ fun PlaceSettingsScreenContent(
                     showDeleteDialog.value = false
                 },
                 onConfirm = {
-                    onDelete()
+                    onEvent(PlaceSettingsAction.DeletePlace)
                     showDeleteDialog.value = false
                 }
             )
+        }
+    }
+}
+
+@Composable
+private inline fun HandleDeleteState(
+    state: State<PlaceSettingsUIState>,
+    noinline onBack: () -> Unit
+) {
+    LaunchedEffect(state.value.isDeleted) {
+        if (state.value.isDeleted) {
+            onBack()
         }
     }
 }
