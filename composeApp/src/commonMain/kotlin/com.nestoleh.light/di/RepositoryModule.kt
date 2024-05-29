@@ -23,7 +23,8 @@ val repositoryModule = module {
     }
     single<PlaceRepository> {
         PlaceDbRepository(
-            dao = get()
+            placeDao = get(),
+            scheduleDao = get()
         )
     }
     single {

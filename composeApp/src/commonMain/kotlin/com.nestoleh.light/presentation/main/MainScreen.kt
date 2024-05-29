@@ -49,6 +49,7 @@ import light.composeapp.generated.resources.ic_down
 import light.composeapp.generated.resources.ic_settings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun MainScreen(
@@ -218,4 +219,16 @@ fun MainScreenContent(
         }
 
     }
+}
+
+@Composable
+@Preview
+private fun MainScreenContentPreview(){
+    MainScreenContent(
+        selectedPlace = null,
+        places = emptyList(),
+        onAction = {},
+        onAddNewPlace = {},
+        onOpenPlaceSettings = {}
+    )
 }

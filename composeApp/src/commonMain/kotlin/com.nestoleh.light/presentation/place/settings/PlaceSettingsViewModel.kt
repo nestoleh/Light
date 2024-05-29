@@ -6,6 +6,8 @@ import co.touchlab.kermit.Logger
 import com.nestoleh.light.core.domain.model.OperationError
 import com.nestoleh.light.core.domain.model.OperationStarted
 import com.nestoleh.light.core.domain.model.OperationSuccess
+import com.nestoleh.light.domain.model.ElectricityStatus
+import com.nestoleh.light.domain.model.Schedule
 import com.nestoleh.light.domain.usecase.DeletePlaceUseCase
 import com.nestoleh.light.domain.usecase.GetPlaceUseCase
 import kotlinx.coroutines.channels.Channel
@@ -38,6 +40,33 @@ class PlaceSettingsViewModel(
             is PlaceSettingsAction.DeletePlace -> {
                 deletePlace()
             }
+
+            is PlaceSettingsAction.ToggleSchedule -> {
+                toggleSchedule(event.day, event.hour)
+            }
+
+            PlaceSettingsAction.Save -> save()
+        }
+    }
+
+    private fun save() {
+        errorEventsChannel.trySend("Not implemented")
+    }
+
+    private fun toggleSchedule(day: Int, hour: Int) {
+        state.value.place?.schedule?.let { schedule ->
+            val currentState = schedule.weekSchedule[day][hour]
+            val nextState = when (currentState) {
+                ElectricityStatus.On -> ElectricityStatus.PossibleOff
+                ElectricityStatus.PossibleOff -> ElectricityStatus.Off
+                ElectricityStatus.Off -> ElectricityStatus.On
+            }
+            schedule.weekSchedule[day][hour] = nextState
+            _state.value = _state.value.copy(
+                place = state.value.place?.copy(
+                    schedule = Schedule(schedule.weekSchedule)
+                )
+            )
         }
     }
 

@@ -1,17 +1,19 @@
 package com.nestoleh.light.data.converters
 
 import com.nestoleh.light.data.database.entity.PlaceEntity
+import com.nestoleh.light.data.database.entity.PlaceWithScheduleEntity
 import com.nestoleh.light.domain.model.Place
 
 
-fun PlaceEntity.toPlace(): Place {
+fun PlaceWithScheduleEntity.toPlace(): Place {
     return Place(
-        id = id,
-        name = name
+        id = this.place.id,
+        name = this.place.name,
+        schedule = this.schedule.toSchedule()
     )
 }
 
-fun List<PlaceEntity>.toPlaces(): List<Place> {
+fun List<PlaceWithScheduleEntity>.toPlaces(): List<Place> {
     return map { it.toPlace() }
 }
 

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "85dc9ff93e14251987eb5cb4016b42ef",
+    "identityHash": "9692507c73361b3677fb7fbbf2e1573c",
     "entities": [
       {
         "tableName": "Place",
@@ -51,11 +51,62 @@
             "key"
           ]
         }
+      },
+      {
+        "tableName": "ScheduleSlotEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`placeId` INTEGER NOT NULL, `dayOfWeek` INTEGER NOT NULL, `hourOfDay` INTEGER NOT NULL, `status` TEXT NOT NULL, PRIMARY KEY(`placeId`, `dayOfWeek`, `hourOfDay`), FOREIGN KEY(`placeId`) REFERENCES `Place`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "placeId",
+            "columnName": "placeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dayOfWeek",
+            "columnName": "dayOfWeek",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hourOfDay",
+            "columnName": "hourOfDay",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "placeId",
+            "dayOfWeek",
+            "hourOfDay"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "Place",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "placeId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '85dc9ff93e14251987eb5cb4016b42ef')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9692507c73361b3677fb7fbbf2e1573c')"
     ]
   }
 }

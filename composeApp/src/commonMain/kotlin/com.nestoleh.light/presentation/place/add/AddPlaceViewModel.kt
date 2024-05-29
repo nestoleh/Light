@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.nestoleh.light.core.domain.model.OperationError
 import com.nestoleh.light.domain.model.Place
+import com.nestoleh.light.domain.model.Schedule
 import com.nestoleh.light.domain.usecase.CreatePlaceUseCase
 import com.nestoleh.light.domain.usecase.SelectPlaceUseCase
 import com.nestoleh.light.domain.validator.PlaceNameValidator
@@ -43,6 +44,9 @@ class AddPlaceViewModel(
 
             AddPlaceAction.Save -> {
                 viewModelScope.launch {
+                    _state.value = _state.value.copy(
+                        name = _state.value.name.trim()
+                    )
                     when (val validationResult = placeNameValidator.validate(_state.value.name)) {
                         is ValidationResult.Error -> {
                             _state.value = _state.value.copy(
@@ -69,7 +73,10 @@ class AddPlaceViewModel(
         viewModelScope.launch {
             createPlaceUseCase(
                 CreatePlaceUseCase.Parameters(
-                    Place(name = name)
+                    Place(
+                        name = name,
+                        schedule = Schedule()
+                    )
                 )
             ).catch {
                 Logger.e(it) { "Ann error occurred when trying to add new place" }

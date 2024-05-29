@@ -7,6 +7,15 @@ plugins {
 }
 
 kotlin {
+
+    targets.configureEach {
+        compilations.configureEach {
+            compilerOptions.configure {
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
+        }
+    }
+
     androidTarget {
         compilations.all {
             kotlinOptions {
