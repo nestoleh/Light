@@ -3,6 +3,9 @@ package com.nestoleh.light.presentation.schedule
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,9 +32,19 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.nestoleh.light.domain.model.ElectricityStatusBlock
 import com.nestoleh.light.presentation.components.ToolbarIcon
@@ -40,13 +53,15 @@ import com.nestoleh.light.presentation.components.color
 import com.nestoleh.light.presentation.components.fullDayName
 import com.nestoleh.light.presentation.components.hourName
 import com.nestoleh.light.presentation.components.shortDayName
+import com.nestoleh.light.presentation.components.util.animateScrollItemToCenter
 import com.nestoleh.light.presentation.components.util.findFirstFullyVisibleItemIndex
 import com.nestoleh.light.presentation.components.util.findLastFullyVisibleItemIndex
-import com.nestoleh.light.presentation.components.util.lastVisiblePosition
+import com.nestoleh.light.presentation.components.util.scrollItemToCenter
 import com.nestoleh.light.util.koinViewModel
 import kotlinx.coroutines.launch
 import light.composeapp.generated.resources.Res
 import light.composeapp.generated.resources.ic_close
+import light.composeapp.generated.resources.ic_today
 import org.jetbrains.compose.resources.painterResource
 import org.koin.core.parameter.parametersOf
 import kotlin.math.absoluteValue
@@ -66,17 +81,23 @@ fun PlaceScheduleScreen(
     )
 }
 
+private enum class ScrollToNowType {
+    None,
+    ImmediateScroll,
+    AnimatedScroll
+}
+
 @Composable
 private fun ScheduleScreenContent(
     state: State<PlaceScheduleUIState>,
     onBack: () -> Unit
 ) {
+    val scrollToNowState = remember { mutableStateOf(ScrollToNowType.ImmediateScroll) }
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     ToolbarTitle(
-                        modifier = Modifier.padding(end = 48.dp),
                         title = state.value.place?.name ?: ""
                     )
                 },
@@ -85,6 +106,15 @@ private fun ScheduleScreenContent(
                         painter = painterResource(Res.drawable.ic_close),
                         onClick = onBack,
                         contentDescription = "Back button"
+                    )
+                },
+                actions = {
+                    ToolbarIcon(
+                        painter = painterResource(Res.drawable.ic_today),
+                        onClick = {
+                            scrollToNowState.value = ScrollToNowType.AnimatedScroll
+                        },
+                        contentDescription = "Today button"
                     )
                 }
             )
@@ -111,17 +141,12 @@ private fun ScheduleScreenContent(
                             if (lazyListState.findLastFullyVisibleItemIndex() == state.value.weekBlocksDayIndices.last()) {
                                 itemPosition = state.value.weekBlocksDayIndices.last()
                             }
-                            val lastVisiblePosition = lazyListState.lastVisiblePosition()
-                            if (state.value.weekBlocksDayIndices.contains(itemPosition)
-                                && itemPosition != state.value.weekBlocksDayIndices[selectedTabState.value]
-                            ) {
-                                selectedTabState.value = state.value.weekBlocksDayIndices.indexOf(itemPosition)
-                            } else if (
-                                lastVisiblePosition >= 0
-                                && lastVisiblePosition < state.value.weekBlocksDayIndices[selectedTabState.value]
-                                && selectedTabState.value > 0
-                            ) {
-                                selectedTabState.value = (selectedTabState.value - 1).coerceAtLeast(0)
+                            val shouldBeSelectedIndex = state.value.weekBlocksDayIndices
+                                .indexOfFirst { it > itemPosition }
+                                .let { if (it >= 0) it - 1 else state.value.weekBlocksDayIndices.size - 1 }
+                                .coerceAtLeast(0)
+                            if (shouldBeSelectedIndex != selectedTabState.value) {
+                                selectedTabState.value = shouldBeSelectedIndex
                             }
                         }
                 }
@@ -137,8 +162,37 @@ private fun ScheduleScreenContent(
                         }
                     }
                 )
+                val density = LocalDensity.current
+                LaunchedEffect(state.value.place, scrollToNowState.value) {
+                    val scrollState = scrollToNowState.value
+                    if (scrollState != ScrollToNowType.None && state.value.place != null) {
+                        scope.launch {
+                            val (index, block) = state.value.countCurrentBlockIndex()
+                            if (index >= 0) {
+                                val shift = block?.let {
+                                    with(density) {
+                                        ((block.hourEnd - state.value.currentTime.timeAsFloat) * oneHourBlockHeightDp)
+                                            .dp.roundToPx()
+                                    }
+                                }
+                                if (scrollState == ScrollToNowType.AnimatedScroll) {
+                                    lazyListState.animateScrollItemToCenter(
+                                        index = index,
+                                        additionalShift = shift ?: 0
+                                    )
+                                } else {
+                                    lazyListState.scrollItemToCenter(
+                                        index = index,
+                                        additionalShift = shift ?: 0
+                                    )
+                                }
+                            }
+                        }
+                        scrollToNowState.value = ScrollToNowType.None
+                    }
+                }
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxSize(),
                     state = lazyListState
                 ) {
                     state.value.weekBlocks.forEachIndexed { dayIndex, daySchedule ->
@@ -146,7 +200,19 @@ private fun ScheduleScreenContent(
                             DayHeader(dayIndex)
                         }
                         items(daySchedule) { block ->
-                            ElectricityStatus(block)
+                            val currentTime = state.value.currentTime
+                            if (currentTime.dayNumber == dayIndex
+                                && currentTime.hours >= block.hourStart
+                                && currentTime.hours < block.hourEnd
+                            ) {
+                                CurrentElectricityStatus(
+                                    block = block,
+                                    hour = currentTime.hours,
+                                    minute = currentTime.minutes
+                                )
+                            } else {
+                                ElectricityStatus(block)
+                            }
                         }
                     }
                 }
@@ -223,13 +289,57 @@ private fun DayHeader(day: Int) {
 
 private const val oneHourBlockHeightDp = 60
 
+
+@Composable
+private fun CurrentElectricityStatus(
+    block: ElectricityStatusBlock,
+    hour: Int,
+    minute: Int,
+) {
+    val textMeasurer = rememberTextMeasurer()
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+    ) {
+        ElectricityStatus(block)
+        Spacer(
+            modifier = Modifier
+                .zIndex(1f)
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .drawWithContent {
+                    val yShift: Float = (hour - block.hourStart + minute / 60f) * oneHourBlockHeightDp.dp.toPx()
+                    drawText(
+                        textMeasurer = textMeasurer,
+                        text = "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}",
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            color = Color.Red,
+                        ),
+                        topLeft = Offset(
+                            x = 8.dp.toPx(),
+                            y = yShift - 16.sp.toPx()
+                        )
+                    )
+                    drawRoundRect(
+                        color = Color.Red,
+                        topLeft = Offset(0f, yShift),
+                        size = Size(size.width, 1.dp.toPx()),
+                        cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx())
+                    )
+                }
+        )
+    }
+}
+
 @Composable
 private fun ElectricityStatus(
-    block: ElectricityStatusBlock
+    block: ElectricityStatusBlock,
 ) {
     Box(
         modifier = Modifier
-            .padding(start = 32.dp, end = 16.dp, top = 1.dp, bottom = 1.dp)
+            .padding(start = 64.dp, end = 16.dp, top = 1.dp, bottom = 1.dp)
             .fillMaxWidth()
             .height(((block.hourEnd - block.hourStart).absoluteValue * oneHourBlockHeightDp).dp)
             .clip(RoundedCornerShape(16.dp))
@@ -240,6 +350,7 @@ private fun ElectricityStatus(
         Text(
             text = "${block.hourStart.hourName()} - ${block.hourEnd.hourName()}",
             modifier = Modifier
+                .zIndex(2f)
                 .clip(RoundedCornerShape(50.dp))
                 .background(MaterialTheme.colorScheme.tertiaryContainer)
                 .padding(vertical = 1.dp, horizontal = 8.dp),

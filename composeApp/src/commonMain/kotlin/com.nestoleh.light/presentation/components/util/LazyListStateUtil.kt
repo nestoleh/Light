@@ -23,3 +23,13 @@ fun LazyListState.findFullyVisibleItemIndex(reversed: Boolean): Int {
 fun LazyListState.lastVisiblePosition(): Int {
     return layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
 }
+
+suspend fun LazyListState.animateScrollItemToCenter(index: Int, additionalShift: Int = 0) {
+    val center = this.layoutInfo.viewportSize.height / 2
+    this.animateScrollToItem(index, -1 * (center + additionalShift))
+}
+
+suspend fun LazyListState.scrollItemToCenter(index: Int, additionalShift: Int = 0) {
+    val center = this.layoutInfo.viewportSize.height / 2
+    this.scrollToItem(index, -1 * (center + additionalShift))
+}

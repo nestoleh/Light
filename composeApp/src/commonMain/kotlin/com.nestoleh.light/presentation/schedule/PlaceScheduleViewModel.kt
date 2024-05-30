@@ -2,34 +2,48 @@ package com.nestoleh.light.presentation.schedule
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.nestoleh.light.domain.model.ElectricityStatusBlock
 import com.nestoleh.light.domain.model.Schedule
 import com.nestoleh.light.domain.usecase.GetPlaceUseCase
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Duration.Companion.seconds
 
 class PlaceScheduleViewModel(
     private val placeId: String,
     private val getPlaceUseCase: GetPlaceUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(PlaceScheduleUIState())
-    val state = _state.asStateFlow()
-
-    init {
-        getPlaceUseCase(GetPlaceUseCase.Parameters(placeId))
-            .onEach {
-                val weekBlocks = it?.schedule?.asBlocks() ?: emptyList()
-                _state.value = _state.value.copy(
-                    place = it,
-                    weekBlocks = weekBlocks,
-                    weekBlocksDayIndices = weekBlocks.daysIndices()
-                )
+    private val _state = combine(
+        getPlaceUseCase(GetPlaceUseCase.Parameters(placeId)),
+        flow {
+            while (true) {
+                emit(currentTime())
+                delay(1.seconds)
             }
-            .launchIn(viewModelScope)
+        }
+    ) { place, currentTime ->
+        val weekBlocks = place?.schedule?.asBlocks() ?: emptyList()
+        PlaceScheduleUIState(
+            place = place,
+            weekBlocks = weekBlocks,
+            weekBlocksDayIndices = weekBlocks.daysIndices(),
+            currentTime = currentTime
+        )
     }
+    val state = _state
+        .onEach {
+            Logger.d { "PlaceScheduleViewModel state: $it" }
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, PlaceScheduleUIState())
 
     private fun List<List<ElectricityStatusBlock>>.daysIndices(): List<Int> {
         val syncedIndices = MutableList(7) { 0 }
@@ -73,5 +87,14 @@ class PlaceScheduleViewModel(
             }
             dayBlocks
         }
+    }
+
+    private fun currentTime(): PlaceScheduleUIState.CurrentTimeState {
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        return PlaceScheduleUIState.CurrentTimeState(
+            dayNumber = now.dayOfWeek.ordinal,
+            hours = now.hour,
+            minutes = now.minute
+        )
     }
 }

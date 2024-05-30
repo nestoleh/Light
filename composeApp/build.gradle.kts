@@ -63,6 +63,7 @@ kotlin {
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
             implementation(libs.kermit)
+            implementation(libs.kotlin.datetime)
         }
     }
 }
