@@ -45,6 +45,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import light.composeapp.generated.resources.Res
 import light.composeapp.generated.resources.button_add_place
+import light.composeapp.generated.resources.ic_date_range
 import light.composeapp.generated.resources.ic_down
 import light.composeapp.generated.resources.ic_settings
 import org.jetbrains.compose.resources.painterResource
@@ -55,7 +56,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun MainScreen(
     viewModel: MainViewModel = koinViewModel(),
     onNavigateToAddPLace: () -> Unit,
-    onNavigateToPlaceSettings: (Place) -> Unit
+    onNavigateToPlaceSettings: (Place) -> Unit,
+    onNavigateToPlaceSchedule: (Place) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     MainScreenContent(
@@ -63,7 +65,8 @@ fun MainScreen(
         places = state.allPlaces,
         onAddNewPlace = onNavigateToAddPLace,
         onOpenPlaceSettings = onNavigateToPlaceSettings,
-        onAction = { viewModel.onAction(it) }
+        onOpenPlaceSchedule = onNavigateToPlaceSchedule,
+        onAction = { viewModel.onAction(it) },
     )
 }
 
@@ -73,7 +76,8 @@ fun MainScreenContent(
     places: List<Place>,
     onAction: (MainAction) -> Unit,
     onAddNewPlace: () -> Unit,
-    onOpenPlaceSettings: (Place) -> Unit
+    onOpenPlaceSettings: (Place) -> Unit,
+    onOpenPlaceSchedule: (Place) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -95,6 +99,17 @@ fun MainScreenContent(
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    if (selectedPlace != null) {
+                        ToolbarIcon(
+                            painter = painterResource(Res.drawable.ic_date_range),
+                            onClick = {
+                                onOpenPlaceSchedule(selectedPlace)
+                            },
+                            contentDescription = "Place settings"
+                        )
+                    }
+                },
                 title = {},
                 actions = {
                     ToolbarIcon(
@@ -223,12 +238,13 @@ fun MainScreenContent(
 
 @Composable
 @Preview
-private fun MainScreenContentPreview(){
+private fun MainScreenContentPreview() {
     MainScreenContent(
         selectedPlace = null,
         places = emptyList(),
         onAction = {},
         onAddNewPlace = {},
-        onOpenPlaceSettings = {}
+        onOpenPlaceSettings = {},
+        onOpenPlaceSchedule = {}
     )
 }

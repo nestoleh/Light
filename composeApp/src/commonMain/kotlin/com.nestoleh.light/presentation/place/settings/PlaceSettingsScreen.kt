@@ -30,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.ElectricityStatus
@@ -38,6 +37,9 @@ import com.nestoleh.light.domain.model.Schedule
 import com.nestoleh.light.presentation.components.LockedProgressButton
 import com.nestoleh.light.presentation.components.ToolbarIcon
 import com.nestoleh.light.presentation.components.ToolbarTitle
+import com.nestoleh.light.presentation.components.color
+import com.nestoleh.light.presentation.components.hourName
+import com.nestoleh.light.presentation.components.shortDayName
 import com.nestoleh.light.util.HandleErrorsFlow
 import com.nestoleh.light.util.koinViewModel
 import light.composeapp.generated.resources.Res
@@ -203,14 +205,9 @@ fun ScheduleCellStatus(
         modifier = Modifier
             .width(statusCellWidthDp.dp)
             .height(40.dp)
-            .padding(2.dp)
-            .background(
-                when (status) {
-                    ElectricityStatus.On -> Color.Green
-                    ElectricityStatus.Off -> Color.Red
-                    ElectricityStatus.PossibleOff -> Color.Yellow
-                }
-            )
+            .clip(RoundedCornerShape(8.dp))
+            .padding(1.dp)
+            .background(status.color)
             .clickable { onClick() }
 
     )
@@ -222,7 +219,7 @@ fun ScheduleDayHeader(dayIndex: Int) {
         modifier = Modifier.width(dayCellWidthDp.dp)
     ) {
         Text(
-            text = dayIndex.dayName(),
+            text = dayIndex.shortDayName(),
             modifier = Modifier
                 .padding(vertical = 3.dp, horizontal = 2.dp)
                 .fillMaxWidth()
@@ -254,27 +251,6 @@ fun ScheduleHourHeader(hourIndex: Int) {
             text = hourIndex.hourName(),
             style = MaterialTheme.typography.titleSmall
         )
-    }
-}
-
-private fun Int.dayName(): String {
-    return when (this) {
-        0 -> "Mon"
-        1 -> "Tue"
-        2 -> "Wed"
-        3 -> "Thu"
-        4 -> "Fri"
-        5 -> "Sat"
-        6 -> "Sun"
-        else -> throw IllegalArgumentException("Invalid day index")
-    }
-}
-
-private fun Int.hourName(): String {
-    return if (this in 0..24) {
-        "${if (this < 10) "0$this" else this}:00"
-    } else {
-        throw IllegalArgumentException("Invalid time index")
     }
 }
 

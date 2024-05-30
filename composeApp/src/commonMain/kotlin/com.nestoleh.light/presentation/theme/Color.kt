@@ -3,8 +3,9 @@ package com.nestoleh.light.presentation.theme
 import androidx.compose.ui.graphics.Color
 
 object LightAppColors {
-    val bulbOn = Color(0xFFE9DD46)
-    val bulbOff = Color(0xFFFFFDDF)
+    val electricityStatusOn = Color(0xFF37A369)
+    val electricityStatusOff = Color(0xFFBA5B4D)
+    val electricityStatusPossibleOff = Color(0xFFFFDE3F)
 
     // THEME COLORS
     // light

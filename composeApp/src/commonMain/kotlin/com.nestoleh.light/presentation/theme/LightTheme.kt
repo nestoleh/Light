@@ -103,7 +103,7 @@ fun LightAppTheme(
     PlatformThemeConfiguration(darkTheme = darkTheme)
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = LightAppTypography,
+        typography = lightAppTypography(),
         content = {
             Box(
                 modifier = Modifier
