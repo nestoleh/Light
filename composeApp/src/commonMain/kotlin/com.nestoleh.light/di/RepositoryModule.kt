@@ -11,6 +11,7 @@ import com.nestoleh.light.domain.usecase.GetPlaceUseCase
 import com.nestoleh.light.domain.usecase.GetSelectedPlaceUseCase
 import com.nestoleh.light.domain.usecase.IsPlaceWithNameExistUseCase
 import com.nestoleh.light.domain.usecase.SelectPlaceUseCase
+import com.nestoleh.light.domain.usecase.UpdatePlaceUseCase
 import com.nestoleh.light.domain.validator.PlaceNameValidator
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -24,7 +25,6 @@ val repositoryModule = module {
     single<PlaceRepository> {
         PlaceDbRepository(
             placeDao = get(),
-            scheduleDao = get()
         )
     }
     single {
@@ -60,6 +60,12 @@ val repositoryModule = module {
         DeletePlaceUseCase(
             placeRepository = get(),
             parametersRepository = get(),
+            dispatcher = get(DispatcherQualifier.IO.qualifier)
+        )
+    }
+    single {
+        UpdatePlaceUseCase(
+            placeRepository = get(),
             dispatcher = get(DispatcherQualifier.IO.qualifier)
         )
     }

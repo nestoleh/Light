@@ -10,17 +10,23 @@ import com.nestoleh.light.domain.model.ElectricityStatus
 import com.nestoleh.light.domain.model.Schedule
 import com.nestoleh.light.domain.usecase.DeletePlaceUseCase
 import com.nestoleh.light.domain.usecase.GetPlaceUseCase
+import com.nestoleh.light.domain.usecase.UpdatePlaceUseCase
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
 
 class PlaceSettingsViewModel(
     private val placeId: Int,
     private val getPlaceUseCase: GetPlaceUseCase,
-    private val deletePlaceUseCase: DeletePlaceUseCase
+    private val deletePlaceUseCase: DeletePlaceUseCase,
+    private val updatePlaceUseCase: UpdatePlaceUseCase
 ) : ViewModel() {
 
     private val errorEventsChannel = Channel<String>()
@@ -45,12 +51,33 @@ class PlaceSettingsViewModel(
                 toggleSchedule(event.day, event.hour)
             }
 
-            PlaceSettingsAction.Save -> save()
+            PlaceSettingsAction.Save -> {
+                save()
+            }
         }
     }
 
     private fun save() {
-        errorEventsChannel.trySend("Not implemented")
+        state.value.place?.let { place ->
+            viewModelScope.launch {
+                _state.value = _state.value.copy(isSaving = true)
+                updatePlaceUseCase(UpdatePlaceUseCase.Parameters(place = place))
+                    .take(1)
+                    .catch {
+                        Logger.e(it) { "An error occurred while saving the place" }
+                        errorEventsChannel.send("An error occurred while saving the place, please try again")
+                        _state.value = _state.value.copy(isSaving = false)
+                    }
+                    .onEach {
+                        _state.value = _state.value.copy(
+                            place = it,
+                            isSaving = false,
+                            isSaved = true
+                        )
+                    }
+                    .launchIn(viewModelScope)
+            }
+        }
     }
 
     private fun toggleSchedule(day: Int, hour: Int) {

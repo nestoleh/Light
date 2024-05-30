@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -32,8 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.ElectricityStatus
-import com.nestoleh.light.domain.model.Place
 import com.nestoleh.light.domain.model.Schedule
+import com.nestoleh.light.presentation.components.LockedProgressButton
 import com.nestoleh.light.presentation.components.ToolbarIcon
 import com.nestoleh.light.presentation.components.ToolbarTitle
 import com.nestoleh.light.util.HandleErrorsFlow
@@ -53,22 +53,22 @@ fun PlaceSettingsScreen(
         parametersOf(id)
     }
     val state = viewModel.state.collectAsState()
-    HandleDeleteState(state, onBack)
+    HandleCloseState(state, onBack)
     val snackbarHostState = remember { SnackbarHostState() }
     HandleErrorsFlow(viewModel.errorEventsFlow, snackbarHostState)
     PlaceSettingsScreenContent(
-        place = state.value.place,
+        state = state.value,
         snackbarHostState = snackbarHostState,
-        onEvent = { viewModel.onAction(it) },
+        onAction = { viewModel.onAction(it) },
         onBack = onBack
     )
 }
 
 @Composable
 fun PlaceSettingsScreenContent(
-    place: Place?,
+    state: PlaceSettingsUIState,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    onEvent: (PlaceSettingsAction) -> Unit,
+    onAction: (PlaceSettingsAction) -> Unit,
     onBack: () -> Unit
 ) {
     val showDeleteDialog = remember { mutableStateOf(false) }
@@ -78,7 +78,7 @@ fun PlaceSettingsScreenContent(
             TopAppBar(
                 title = {
                     ToolbarTitle(
-                        title = place?.name ?: ""
+                        title = state.place?.name ?: ""
                     )
                 },
                 navigationIcon = {
@@ -89,7 +89,7 @@ fun PlaceSettingsScreenContent(
                     )
                 },
                 actions = {
-                    if (place != null) {
+                    if (state.place != null) {
                         ToolbarIcon(
                             painter = painterResource(Res.drawable.ic_delete),
                             onClick = {
@@ -110,23 +110,30 @@ fun PlaceSettingsScreenContent(
                 .padding(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (place != null) {
+            if (state.place != null) {
                 Spacer(modifier = Modifier.height(32.dp))
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    text = "Schedule",
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center
+                )
                 ScheduleGrid(
-                    schedule = place.schedule,
+                    schedule = state.place.schedule,
                     onScheduleToggle = { day, hour ->
-                        onEvent(PlaceSettingsAction.ToggleSchedule(day, hour))
+                        onAction(PlaceSettingsAction.ToggleSchedule(day, hour))
                     }
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 Spacer(modifier = Modifier.weight(1f))
-                Button(
+                LockedProgressButton(
+                    isInProgress = state.isSaving,
                     onClick = {
-                        onEvent(PlaceSettingsAction.Save)
+                        onAction(PlaceSettingsAction.Save)
                     }
-                ) {
-                    Text(text = "Save")
-                }
+                )
             }
         }
         if (showDeleteDialog.value) {
@@ -135,7 +142,7 @@ fun PlaceSettingsScreenContent(
                     showDeleteDialog.value = false
                 },
                 onConfirm = {
-                    onEvent(PlaceSettingsAction.DeletePlace)
+                    onAction(PlaceSettingsAction.DeletePlace)
                     showDeleteDialog.value = false
                 }
             )
@@ -247,12 +254,12 @@ private fun Int.hourName(): String {
 }
 
 @Composable
-private inline fun HandleDeleteState(
+private inline fun HandleCloseState(
     state: State<PlaceSettingsUIState>,
     noinline onBack: () -> Unit
 ) {
-    LaunchedEffect(state.value.isDeleted) {
-        if (state.value.isDeleted) {
+    LaunchedEffect(state.value.isDeleted, state.value.isSaved) {
+        if (state.value.isDeleted || state.value.isSaved) {
             onBack()
         }
     }

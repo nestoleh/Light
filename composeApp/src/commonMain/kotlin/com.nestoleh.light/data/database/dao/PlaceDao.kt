@@ -6,8 +6,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.nestoleh.light.data.database.entity.PlaceEntity
 import com.nestoleh.light.data.database.entity.PlaceWithScheduleEntity
+import com.nestoleh.light.data.database.entity.ScheduleSlotEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -15,6 +17,15 @@ interface PlaceDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlace(place: PlaceEntity): Long
+
+    @Transaction
+    suspend fun upsertPlaceWithSchedule(place: PlaceWithScheduleEntity) {
+        insertPlace(place.place)
+        upsertScheduleList(place.schedule)
+    }
+
+    @Upsert
+    suspend fun upsertScheduleList(slots: List<ScheduleSlotEntity>)
 
     @Update
     suspend fun updatePlace(place: PlaceEntity)
