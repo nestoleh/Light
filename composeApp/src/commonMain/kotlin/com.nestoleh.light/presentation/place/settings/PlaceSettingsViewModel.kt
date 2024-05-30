@@ -12,7 +12,6 @@ import com.nestoleh.light.domain.usecase.DeletePlaceUseCase
 import com.nestoleh.light.domain.usecase.GetPlaceUseCase
 import com.nestoleh.light.domain.usecase.UpdatePlaceUseCase
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -23,7 +22,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
 class PlaceSettingsViewModel(
-    private val placeId: Int,
+    private val placeId: String,
     private val getPlaceUseCase: GetPlaceUseCase,
     private val deletePlaceUseCase: DeletePlaceUseCase,
     private val updatePlaceUseCase: UpdatePlaceUseCase

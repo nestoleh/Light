@@ -21,7 +21,7 @@ class GetSelectedPlaceUseCase(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun doWork(params: Unit): Flow<Place?> {
-        return parametersRepository.getIntAsFlow(ParametersKeys.SELECTED_PLACE_ID)
+        return parametersRepository.getStringAsFlow(ParametersKeys.SELECTED_PLACE_ID)
             .flatMapLatest { selectedPlaceId ->
                 if (selectedPlaceId == null) {
                     getFirstPlaceOrNull()

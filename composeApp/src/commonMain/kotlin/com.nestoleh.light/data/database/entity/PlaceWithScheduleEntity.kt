@@ -5,7 +5,8 @@ import androidx.room.Relation
 
 
 data class PlaceWithScheduleEntity(
-    @Embedded val place: PlaceEntity,
+    @Embedded
+    val place: PlaceEntity,
     @Relation(
         parentColumn = "id",
         entityColumn = "placeId"

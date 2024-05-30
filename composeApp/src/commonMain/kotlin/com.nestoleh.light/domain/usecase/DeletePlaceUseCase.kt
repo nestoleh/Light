@@ -15,13 +15,13 @@ class DeletePlaceUseCase(
 
     override suspend fun runOperation(params: Parameters) = withContext(dispatcher) {
         placeRepository.deletePlace(params.id)
-        val selectedPlaceId = parametersRepository.getInt(ParametersKeys.SELECTED_PLACE_ID)
+        val selectedPlaceId = parametersRepository.getString(ParametersKeys.SELECTED_PLACE_ID)
         if (selectedPlaceId == params.id) {
             parametersRepository.deleteValue(ParametersKeys.SELECTED_PLACE_ID)
         }
     }
 
     data class Parameters(
-        val id: Int
+        val id: String
     )
 }

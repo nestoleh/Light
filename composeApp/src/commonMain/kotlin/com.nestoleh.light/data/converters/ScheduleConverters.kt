@@ -5,7 +5,7 @@ import com.nestoleh.light.domain.model.ElectricityStatus
 import com.nestoleh.light.domain.model.Schedule
 
 fun Schedule.toScheduleSlotEntities(
-    placeId: Int
+    placeId: String
 ): List<ScheduleSlotEntity> {
     val slots = mutableListOf<ScheduleSlotEntity>()
     this.weekSchedule.forEachIndexed { dayIndex, dayOfWeekArray ->

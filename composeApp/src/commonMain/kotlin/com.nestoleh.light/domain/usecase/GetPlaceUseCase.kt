@@ -15,6 +15,6 @@ class GetPlaceUseCase(
     }
 
     data class Parameters(
-        val id: Int
+        val id: String
     )
 }

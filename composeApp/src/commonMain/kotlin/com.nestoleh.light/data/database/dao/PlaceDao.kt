@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.Flow
 interface PlaceDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPlace(place: PlaceEntity): Long
+    suspend fun insertPlace(place: PlaceEntity)
 
     @Transaction
     suspend fun upsertPlaceWithSchedule(place: PlaceWithScheduleEntity) {
@@ -44,13 +44,13 @@ interface PlaceDao {
 
     @Transaction
     @Query("SELECT * FROM Place WHERE id = :placeId LIMIT 1")
-    fun getPlaceAsFlow(placeId: Int): Flow<PlaceWithScheduleEntity?>
+    fun getPlaceAsFlow(placeId: String): Flow<PlaceWithScheduleEntity?>
 
     @Transaction
     @Query("SELECT * FROM Place WHERE id = :placeId LIMIT 1")
-    suspend fun getPlace(placeId: Int): PlaceWithScheduleEntity?
+    suspend fun getPlace(placeId: String): PlaceWithScheduleEntity?
 
     @Transaction
     @Query("DELETE FROM Place WHERE id = :placeId")
-    suspend fun delete(placeId: Int)
+    suspend fun delete(placeId: String)
 }

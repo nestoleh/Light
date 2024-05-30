@@ -17,13 +17,13 @@ class SelectPlaceUseCase(
     override suspend fun runOperation(params: Parameters) = withContext(dispatcher) {
         val isPlaceExist = placeRepository.getPlaceAsFlow(params.placeId).firstOrNull() != null
         if (isPlaceExist) {
-            parametersRepository.putInt(ParametersKeys.SELECTED_PLACE_ID, params.placeId)
+            parametersRepository.putString(ParametersKeys.SELECTED_PLACE_ID, params.placeId)
         } else {
             throw IllegalArgumentException("Place with id ${params.placeId} does not exist")
         }
     }
 
     data class Parameters(
-        val placeId: Int
+        val placeId: String
     )
 }

@@ -78,11 +78,11 @@ sealed class Route(val route: String) {
     data object AddNewPlace : Route("addPlace")
     data object PlaceSettings : Route("placeSettings/{id}") {
         val arguments = listOf(
-            navArgument("id") { type = NavType.IntType }
+            navArgument("id") { type = NavType.StringType }
         )
 
-        fun createRoute(id: Int) = "placeSettings/$id"
+        fun createRoute(id: String) = "placeSettings/$id"
 
-        fun NavBackStackEntry.parseId() = arguments?.getInt("id")
+        fun NavBackStackEntry.parseId() = arguments?.getString("id")
     }
 }

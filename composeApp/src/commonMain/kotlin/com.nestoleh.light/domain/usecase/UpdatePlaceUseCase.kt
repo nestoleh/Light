@@ -1,8 +1,6 @@
 package com.nestoleh.light.domain.usecase
 
 import com.nestoleh.light.core.domain.usecase.ResultUseCase
-import com.nestoleh.light.data.converters.toPlace
-import com.nestoleh.light.data.database.entity.PlaceEntity
 import com.nestoleh.light.domain.model.Place
 import com.nestoleh.light.domain.repository.PlaceRepository
 import kotlinx.coroutines.CoroutineDispatcher

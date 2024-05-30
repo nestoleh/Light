@@ -11,8 +11,8 @@ interface PlaceRepository {
     suspend fun getAllPlaces(): List<Place>
     suspend fun getAllPlacesWithName(name: String): List<Place>
 
-    fun getPlaceAsFlow(placeId: Int): Flow<Place?>
-    suspend fun getPlace(placeId: Int): Place?
+    fun getPlaceAsFlow(placeId: String): Flow<Place?>
+    suspend fun getPlace(placeId: String): Place?
 
-    suspend fun deletePlace(placeId: Int)
+    suspend fun deletePlace(placeId: String)
 }

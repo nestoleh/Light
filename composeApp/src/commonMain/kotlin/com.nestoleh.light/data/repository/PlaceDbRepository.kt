@@ -16,9 +16,9 @@ class PlaceDbRepository(
 ) : PlaceRepository {
 
     override suspend fun addPlace(place: Place): Place {
-        val id = placeDao.insertPlace(place.toPlaceEntity()).toInt()
-        placeDao.upsertScheduleList(place.schedule.toScheduleSlotEntities(id))
-        return place.copy(id = id)
+        placeDao.insertPlace(place.toPlaceEntity())
+        placeDao.upsertScheduleList(place.schedule.toScheduleSlotEntities(place.id))
+        return place
     }
 
     override suspend fun updatePlace(place: Place): Place {
@@ -44,15 +44,15 @@ class PlaceDbRepository(
         return placeDao.getAllPlacesWithName(name).toPlaces()
     }
 
-    override fun getPlaceAsFlow(placeId: Int): Flow<Place?> {
+    override fun getPlaceAsFlow(placeId: String): Flow<Place?> {
         return placeDao.getPlaceAsFlow(placeId).map { it?.toPlace() }
     }
 
-    override suspend fun getPlace(placeId: Int): Place? {
+    override suspend fun getPlace(placeId: String): Place? {
         return placeDao.getPlace(placeId)?.toPlace()
     }
 
-    override suspend fun deletePlace(placeId: Int) {
+    override suspend fun deletePlace(placeId: String) {
         return placeDao.delete(placeId)
     }
 }
