@@ -31,7 +31,7 @@ import org.jetbrains.compose.resources.stringResource
 fun PlacesSelectorBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState,
-    selectedPlace: Place?,
+    selectedPlaceState: SelectedPlaceState,
     allPlaces: List<Place>,
     onPlaceSelected: (Place) -> Unit,
     onAddNewPlace: () -> Unit,
@@ -64,7 +64,7 @@ fun PlacesSelectorBottomSheet(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    if (it.id == selectedPlace?.id) {
+                    if (it.id == (selectedPlaceState as? SelectedPlaceState.Selected)?.place?.id) {
                         Icon(
                             painter = painterResource(Res.drawable.ic_check),
                             contentDescription = "Selected item icon"

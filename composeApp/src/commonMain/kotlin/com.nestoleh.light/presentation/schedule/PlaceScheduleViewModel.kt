@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.nestoleh.light.domain.model.ElectricityStatusBlock
 import com.nestoleh.light.domain.model.Schedule
+import com.nestoleh.light.domain.usecase.CalculateScheduleAsBlocksUseCase
 import com.nestoleh.light.domain.usecase.GetPlaceUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,7 +20,8 @@ import kotlin.time.Duration.Companion.seconds
 
 class PlaceScheduleViewModel(
     private val placeId: String,
-    private val getPlaceUseCase: GetPlaceUseCase
+    private val getPlaceUseCase: GetPlaceUseCase,
+    private val calculateScheduleAsBlocksUseCase: CalculateScheduleAsBlocksUseCase
 ) : ViewModel() {
 
     private val _state = combine(
@@ -31,7 +33,9 @@ class PlaceScheduleViewModel(
             }
         }
     ) { place, currentTime ->
-        val weekBlocks = place?.schedule?.asBlocks() ?: emptyList()
+        val weekBlocks = place?.schedule?.let {
+            calculateScheduleAsBlocksUseCase.executeSync(it)
+        } ?: emptyList()
         PlaceScheduleUIState(
             place = place,
             weekBlocks = weekBlocks,
@@ -39,6 +43,7 @@ class PlaceScheduleViewModel(
             currentTime = currentTime
         )
     }
+
     val state = _state
         .onEach {
             Logger.d { "PlaceScheduleViewModel state: $it" }

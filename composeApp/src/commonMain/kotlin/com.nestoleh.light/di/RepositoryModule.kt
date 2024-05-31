@@ -4,6 +4,7 @@ import com.nestoleh.light.data.repository.ParametersDbRepository
 import com.nestoleh.light.data.repository.PlaceDbRepository
 import com.nestoleh.light.domain.repository.ParametersRepository
 import com.nestoleh.light.domain.repository.PlaceRepository
+import com.nestoleh.light.domain.usecase.CalculateScheduleAsBlocksUseCase
 import com.nestoleh.light.domain.usecase.CreatePlaceUseCase
 import com.nestoleh.light.domain.usecase.DeletePlaceUseCase
 import com.nestoleh.light.domain.usecase.GetAllPlacesUseCase
@@ -67,6 +68,11 @@ val repositoryModule = module {
         UpdatePlaceUseCase(
             placeRepository = get(),
             dispatcher = get(DispatcherQualifier.IO.qualifier)
+        )
+    }
+    single {
+        CalculateScheduleAsBlocksUseCase(
+            dispatcher = get(DispatcherQualifier.Default.qualifier)
         )
     }
 }

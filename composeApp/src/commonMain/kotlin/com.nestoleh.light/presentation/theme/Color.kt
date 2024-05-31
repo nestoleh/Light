@@ -6,6 +6,7 @@ object LightAppColors {
     val electricityStatusOn = Color(0xFF37A369)
     val electricityStatusOff = Color(0xFFBA5B4D)
     val electricityStatusPossibleOff = Color(0xFFFFDE3F)
+    val onElectricityStatusColor = Color(0xFF000000)
 
     // THEME COLORS
     // light
