@@ -1,12 +1,9 @@
 package com.nestoleh.light.presentation.main
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,13 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -42,7 +37,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,6 +46,7 @@ import com.nestoleh.light.domain.model.Place
 import com.nestoleh.light.presentation.components.ToolbarIcon
 import com.nestoleh.light.presentation.components.color
 import com.nestoleh.light.presentation.components.hourName
+import com.nestoleh.light.presentation.main.components.CurrentElectricityPeriod
 import com.nestoleh.light.presentation.theme.LightAppColors
 import com.nestoleh.light.util.HandleErrorsFlow
 import com.nestoleh.light.util.koinViewModel
@@ -64,7 +59,6 @@ import light.composeapp.generated.resources.ic_down
 import light.composeapp.generated.resources.ic_settings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun MainScreen(
@@ -221,32 +215,9 @@ fun MainScreenContent(
 
                 is SelectedPlaceState.Selected -> {
                     Spacer(modifier = Modifier.height(32.dp))
-                    val color by animateColorAsState(
-                        selectedPlaceState.currentBlock?.status?.color
-                            ?: MaterialTheme.colorScheme.surfaceTint
+                    CurrentElectricityPeriod(
+                        period = selectedPlaceState.currentPeriod
                     )
-                    Box(
-                        modifier = Modifier
-                            .size(250.dp)
-                            .clip(CircleShape)
-                            .background(color),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Electricity status:\n${selectedPlaceState.currentBlock?.status ?: "Unknown"}",
-                            textAlign = TextAlign.Center,
-                            color = LightAppColors.onElectricityStatusColor
-                        )
-                    }
-                    if (selectedPlaceState.next1Block != null) {
-                        Spacer(modifier = Modifier.height(32.dp))
-                        NextElectricityBlock(selectedPlaceState.next1Block)
-                        if (selectedPlaceState.next2Block != null) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            NextElectricityBlock(selectedPlaceState.next2Block)
-                        }
-                    }
-
                     Spacer(modifier = Modifier.height(32.dp))
                 }
             }
@@ -278,7 +249,6 @@ fun MainScreenContent(
                 onDismissRequest = { showPlacesBottomSheet = false }
             )
         }
-
     }
 }
 
@@ -302,17 +272,4 @@ private fun NextElectricityBlock(
             color = LightAppColors.onElectricityStatusColor
         )
     }
-}
-
-@Composable
-@Preview
-private fun MainScreenContentPreview() {
-    MainScreenContent(
-        selectedPlaceState = SelectedPlaceState.None,
-        places = emptyList(),
-        onAction = {},
-        onAddNewPlace = {},
-        onOpenPlaceSettings = {},
-        onOpenPlaceSchedule = {},
-    )
 }

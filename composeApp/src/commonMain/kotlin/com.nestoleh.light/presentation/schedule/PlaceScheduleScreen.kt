@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import co.touchlab.kermit.Logger
 import com.nestoleh.light.domain.model.ElectricityStatusBlock
 import com.nestoleh.light.presentation.components.ToolbarIcon
 import com.nestoleh.light.presentation.components.ToolbarTitle
@@ -59,6 +60,9 @@ import com.nestoleh.light.presentation.components.util.findLastFullyVisibleItemI
 import com.nestoleh.light.presentation.components.util.scrollItemToCenter
 import com.nestoleh.light.util.koinViewModel
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import light.composeapp.generated.resources.Res
 import light.composeapp.generated.resources.ic_close
 import light.composeapp.generated.resources.ic_today
@@ -127,18 +131,21 @@ private fun ScheduleScreenContent(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                val selectedTabState = remember { mutableStateOf(0) }
+                val selectedTabState = remember {
+                    mutableStateOf(
+                        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).dayOfWeek.ordinal
+                    )
+                }
                 val lazyListState: LazyListState = rememberLazyListState()
                 val scope = rememberCoroutineScope()
 
                 LaunchedEffect(Unit) {
                     snapshotFlow { lazyListState.layoutInfo }
                         .collect {
+                            if (lazyListState.layoutInfo.totalItemsCount <= 0) return@collect
                             var itemPosition = lazyListState.itemFocusPosition()
-                            if (itemPosition == -1) {
-                                return@collect
-                            }
-                            if (lazyListState.findLastFullyVisibleItemIndex() == state.value.weekBlocksDayIndices.last()) {
+                            if (itemPosition == -1) return@collect
+                            if (lazyListState.findLastFullyVisibleItemIndex() >= state.value.weekBlocksDayIndices.last()) {
                                 itemPosition = state.value.weekBlocksDayIndices.last()
                             }
                             val shouldBeSelectedIndex = state.value.weekBlocksDayIndices
@@ -146,6 +153,7 @@ private fun ScheduleScreenContent(
                                 .let { if (it >= 0) it - 1 else state.value.weekBlocksDayIndices.size - 1 }
                                 .coerceAtLeast(0)
                             if (shouldBeSelectedIndex != selectedTabState.value) {
+                                Logger.d { "Selected tab = $shouldBeSelectedIndex" }
                                 selectedTabState.value = shouldBeSelectedIndex
                             }
                         }
@@ -153,10 +161,9 @@ private fun ScheduleScreenContent(
 
                 DaysTabs(
                     selectedTabState = selectedTabState,
-                    onTabSelected = {
-                        selectedTabState.value = it
+                    onTabSelected = { newSelectedTab ->
                         scope.launch {
-                            state.value.weekBlocksDayIndices.getOrNull(selectedTabState.value)?.let { index ->
+                            state.value.weekBlocksDayIndices.getOrNull(newSelectedTab)?.let { index ->
                                 lazyListState.animateScrollToItem(index)
                             }
                         }
@@ -175,6 +182,7 @@ private fun ScheduleScreenContent(
                                             .dp.roundToPx()
                                     }
                                 }
+                                Logger.d { "Scrolling to $index with shift $shift" }
                                 if (scrollState == ScrollToNowType.AnimatedScroll) {
                                     lazyListState.animateScrollItemToCenter(
                                         index = index,

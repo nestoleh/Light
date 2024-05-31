@@ -45,9 +45,6 @@ class PlaceScheduleViewModel(
     }
 
     val state = _state
-        .onEach {
-            Logger.d { "PlaceScheduleViewModel state: $it" }
-        }
         .stateIn(viewModelScope, SharingStarted.Eagerly, PlaceScheduleUIState())
 
     private fun List<List<ElectricityStatusBlock>>.daysIndices(): List<Int> {

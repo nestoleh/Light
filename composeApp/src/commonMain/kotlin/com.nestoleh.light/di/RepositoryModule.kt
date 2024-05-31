@@ -4,6 +4,7 @@ import com.nestoleh.light.data.repository.ParametersDbRepository
 import com.nestoleh.light.data.repository.PlaceDbRepository
 import com.nestoleh.light.domain.repository.ParametersRepository
 import com.nestoleh.light.domain.repository.PlaceRepository
+import com.nestoleh.light.domain.usecase.CalculateNearestElectricityPeriods2UseCase
 import com.nestoleh.light.domain.usecase.CalculateScheduleAsBlocksUseCase
 import com.nestoleh.light.domain.usecase.CreatePlaceUseCase
 import com.nestoleh.light.domain.usecase.DeletePlaceUseCase
@@ -72,6 +73,11 @@ val repositoryModule = module {
     }
     single {
         CalculateScheduleAsBlocksUseCase(
+            dispatcher = get(DispatcherQualifier.Default.qualifier)
+        )
+    }
+    single {
+        CalculateNearestElectricityPeriods2UseCase(
             dispatcher = get(DispatcherQualifier.Default.qualifier)
         )
     }

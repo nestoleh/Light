@@ -1,6 +1,6 @@
 package com.nestoleh.light.presentation.main
 
-import com.nestoleh.light.domain.model.ElectricityStatusBlock
+import com.nestoleh.light.domain.model.ElectricityStatusPeriod
 import com.nestoleh.light.domain.model.Place
 
 data class MainUIState(
@@ -12,9 +12,8 @@ sealed interface SelectedPlaceState {
     data object None : SelectedPlaceState
     data class Selected(
         val place: Place,
-        val currentBlock: ElectricityStatusBlock?,
-        val next1Block: ElectricityStatusBlock?,
-        val next2Block: ElectricityStatusBlock?,
+        val currentPeriod: ElectricityStatusPeriod?,
+        val futurePeriods: List<ElectricityStatusPeriod.Limited>,
     ) : SelectedPlaceState
 }
 

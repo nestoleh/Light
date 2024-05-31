@@ -9,33 +9,26 @@ import com.nestoleh.light.core.domain.model.OperationSuccess
 import com.nestoleh.light.core.domain.usecase.invoke
 import com.nestoleh.light.domain.model.ElectricityStatusBlock
 import com.nestoleh.light.domain.model.Place
-import com.nestoleh.light.domain.usecase.CalculateScheduleAsBlocksUseCase
+import com.nestoleh.light.domain.usecase.CalculateNearestElectricityPeriods2UseCase
 import com.nestoleh.light.domain.usecase.GetAllPlacesUseCase
 import com.nestoleh.light.domain.usecase.GetSelectedPlaceUseCase
 import com.nestoleh.light.domain.usecase.SelectPlaceUseCase
 import com.nestoleh.light.util.nextElementIndexes
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Duration.Companion.seconds
 
 class MainViewModel(
     getAllPlacesUseCase: GetAllPlacesUseCase,
     getSelectedPlaceUseCase: GetSelectedPlaceUseCase,
     private val selectPlaceUseCase: SelectPlaceUseCase,
-    private val calculateScheduleAsBlocksUseCase: CalculateScheduleAsBlocksUseCase
+    private val calculateNearestElectricityPeriodsUseCase: CalculateNearestElectricityPeriods2UseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MainUIState())
@@ -45,30 +38,25 @@ class MainViewModel(
     val errorEventsFlow = errorEventsChannel.receiveAsFlow()
 
     init {
-        getSelectedPlaceUseCase()
+        getSelectedPlaceUseCase.invoke()
             .flatMapLatest { place ->
+                Logger.d{ "Block = new place"}
                 if (place == null) {
                     flowOf(SelectedPlaceState.None)
                 } else {
-                    val weekBlocks = calculateScheduleAsBlocksUseCase.executeSync(place.schedule)
-                    flow {
-                        while (true) {
-                            emit(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
-                            delay(1.seconds)
+                    calculateNearestElectricityPeriodsUseCase(place.schedule)
+                        .map {
+                            Logger.d{ "Block = $it"}
+                            if (it == null) {
+                                errorEventsChannel.send(" Unexpected error occurred, please check you schedule")
+                                Logger.e { "Calculating nearest electricity periods failed" }
+                            }
+                            SelectedPlaceState.Selected(
+                                place = place,
+                                currentPeriod = it?.current,
+                                futurePeriods = it?.future ?: emptyList()
+                            )
                         }
-                    }.map { currentTime: LocalDateTime ->
-                        val currentI = currentTime.dayOfWeek.ordinal
-                        val currentJ = weekBlocks[currentI].indexOfFirst { it.hourEnd > currentTime.hour }
-                        val (next1I, next1J) = weekBlocks.findNextBlockIndexesWithDifferentStatus(currentI, currentJ)
-                        val (next2I, next2J) = weekBlocks.findNextBlockIndexesWithDifferentStatus(next1I, next1J)
-
-                        SelectedPlaceState.Selected(
-                            place = place,
-                            currentBlock = if (currentJ >= 0) weekBlocks[currentI][currentJ] else null,
-                            next1Block = if (next1I >= 0) weekBlocks[next1I][next1J] else null,
-                            next2Block = if (next2I >= 0) weekBlocks[next2I][next2J] else null,
-                        )
-                    }
                 }
             }
             .onEach { place ->
