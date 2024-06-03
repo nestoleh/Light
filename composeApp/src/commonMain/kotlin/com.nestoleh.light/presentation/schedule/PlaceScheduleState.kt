@@ -28,7 +28,7 @@ data class PlaceScheduleUIState(
         val dayNumber: Int = 0,
         val hours: Int = 0,
         val minutes: Int = 0,
-    ){
+    ) {
         val timeAsFloat: Float
             get() = hours + minutes / 60f
     }

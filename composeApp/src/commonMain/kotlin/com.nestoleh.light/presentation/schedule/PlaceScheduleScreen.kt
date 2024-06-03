@@ -67,7 +67,9 @@ import kotlinx.datetime.toLocalDateTime
 import light.composeapp.generated.resources.Res
 import light.composeapp.generated.resources.ic_close
 import light.composeapp.generated.resources.ic_today
+import light.composeapp.generated.resources.schedule_footer
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.core.parameter.parametersOf
 import kotlin.math.absoluteValue
 
@@ -238,7 +240,7 @@ private fun ScheduleScreenContent(
                                 modifier = Modifier
                                     .padding(bottom = 8.dp)
                                     .alpha(0.5f),
-                                text = "End of week",
+                                text = stringResource(Res.string.schedule_footer),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

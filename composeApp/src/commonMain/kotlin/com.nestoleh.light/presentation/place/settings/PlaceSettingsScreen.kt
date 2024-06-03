@@ -3,18 +3,25 @@ package com.nestoleh.light.presentation.place.settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -40,12 +47,18 @@ import com.nestoleh.light.presentation.components.ToolbarTitle
 import com.nestoleh.light.presentation.components.color
 import com.nestoleh.light.presentation.components.hourName
 import com.nestoleh.light.presentation.components.shortDayName
-import com.nestoleh.light.util.HandleErrorsFlow
+import com.nestoleh.light.presentation.components.statusName
+import com.nestoleh.light.presentation.components.util.HandleErrorsFlow
+import com.nestoleh.light.presentation.theme.LightAppColors
 import com.nestoleh.light.util.koinViewModel
 import light.composeapp.generated.resources.Res
-import light.composeapp.generated.resources.button_save
 import light.composeapp.generated.resources.ic_close
 import light.composeapp.generated.resources.ic_delete
+import light.composeapp.generated.resources.ic_lightbulb
+import light.composeapp.generated.resources.place_settings_button_save
+import light.composeapp.generated.resources.place_settings_schedule_tips_message
+import light.composeapp.generated.resources.place_settings_schedule_tips_title
+import light.composeapp.generated.resources.place_settings_schedule_title
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.core.parameter.parametersOf
@@ -59,9 +72,15 @@ fun PlaceSettingsScreen(
         parametersOf(id)
     }
     val state = viewModel.state.collectAsState()
-    HandleCloseState(state, onBack)
+    HandleCloseState(
+        state = state,
+        onBack = onBack
+    )
     val snackbarHostState = remember { SnackbarHostState() }
-    HandleErrorsFlow(viewModel.errorEventsFlow, snackbarHostState)
+    HandleErrorsFlow(
+        errorsFlow = viewModel.errorEventsFlow,
+        snackbarHostState = snackbarHostState
+    )
     PlaceSettingsScreenContent(
         state = state.value,
         snackbarHostState = snackbarHostState,
@@ -117,15 +136,19 @@ fun PlaceSettingsScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (state.place != null) {
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+                ScheduleTips()
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    text = "Schedule",
-                    style = MaterialTheme.typography.titleMedium,
+                        .fillMaxWidth(),
+                    text = stringResource(Res.string.place_settings_schedule_title),
+                    style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center
                 )
+                Spacer(modifier = Modifier.height(16.dp))
                 ScheduleGrid(
                     schedule = state.place.schedule,
                     onScheduleToggle = { day, hour ->
@@ -135,7 +158,7 @@ fun PlaceSettingsScreenContent(
                 Spacer(modifier = Modifier.height(32.dp))
                 Spacer(modifier = Modifier.weight(1f))
                 LockedProgressButton(
-                    text = stringResource(Res.string.button_save),
+                    text = stringResource(Res.string.place_settings_button_save),
                     isInProgress = state.isSaving,
                     onClick = {
                         onAction(PlaceSettingsAction.Save)
@@ -212,7 +235,6 @@ fun ScheduleCellStatus(
             .padding(1.dp)
             .background(status.color)
             .clickable { onClick() }
-
     )
 }
 
@@ -266,5 +288,77 @@ private inline fun HandleCloseState(
         if (state.value.isDeleted || state.value.isSaved) {
             onBack()
         }
+    }
+}
+
+@Composable
+private fun ScheduleTips(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Icon(
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .size(24.dp),
+                painter = painterResource(Res.drawable.ic_lightbulb),
+                contentDescription = "Tip icon",
+            )
+            Column(
+                modifier = Modifier.padding(start = 16.dp)
+            ) {
+                Text(
+                    modifier = Modifier,
+                    text = stringResource(Res.string.place_settings_schedule_tips_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    modifier = Modifier,
+                    text = stringResource(Res.string.place_settings_schedule_tips_message),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Row(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .widthIn(max = 300.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    StatusExplanation(ElectricityStatus.On)
+                    StatusExplanation(ElectricityStatus.PossibleOff)
+                    StatusExplanation(ElectricityStatus.Off)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.StatusExplanation(
+    status: ElectricityStatus
+) {
+    Box(
+        modifier = Modifier
+            .weight(1f)
+            .height(40.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(status.color)
+            .padding(4.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = status.statusName,
+            maxLines = 2,
+            textAlign = TextAlign.Center,
+            color = LightAppColors.onElectricityStatusColor,
+            style = MaterialTheme.typography.labelMedium,
+        )
     }
 }

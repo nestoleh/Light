@@ -1,4 +1,4 @@
-package com.nestoleh.light.util
+package com.nestoleh.light.presentation.components.util
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable

@@ -21,6 +21,10 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import light.composeapp.generated.resources.Res
+import light.composeapp.generated.resources.main_screen_error_place_selection
+import light.composeapp.generated.resources.main_screen_error_schedule
+import org.jetbrains.compose.resources.getString
 
 class MainViewModel(
     getAllPlacesUseCase: GetAllPlacesUseCase,
@@ -38,15 +42,13 @@ class MainViewModel(
     init {
         getSelectedPlaceUseCase.invoke()
             .flatMapLatest { place ->
-                Logger.d { "Block = new place" }
                 if (place == null) {
                     flowOf(SelectedPlaceState.None)
                 } else {
                     calculateNearestElectricityPeriodsUseCase(place.schedule)
                         .map {
-                            Logger.d { "Block = $it" }
                             if (it == null) {
-                                errorEventsChannel.send("Unexpected error occurred, please check you schedule")
+                                errorEventsChannel.send(getString(Res.string.main_screen_error_schedule))
                                 Logger.e { "Calculating nearest electricity periods failed" }
                             }
                             SelectedPlaceState.Selected(
@@ -82,7 +84,7 @@ class MainViewModel(
             .onEach {
                 when (it) {
                     is OperationError -> {
-                        errorEventsChannel.send("An error occurred while selecting the place, please try again")
+                        errorEventsChannel.send(getString(Res.string.main_screen_error_place_selection))
                         Logger.e(it.throwable) { "Selecting place id = ${place.id} failed" }
                     }
 

@@ -20,6 +20,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import light.composeapp.generated.resources.Res
+import light.composeapp.generated.resources.add_new_place_error_unexpected
+import org.jetbrains.compose.resources.getString
 
 class AddPlaceViewModel(
     private val createPlaceUseCase: CreatePlaceUseCase,
@@ -57,7 +60,6 @@ class AddPlaceViewModel(
                         ValidationResult.Valid -> {
                             viewModelScope.launch {
                                 savePlace(_state.value.name)
-
                             }
                         }
                     }
@@ -79,8 +81,8 @@ class AddPlaceViewModel(
                     )
                 )
             ).catch {
-                Logger.e(it) { "Ann error occurred when trying to add new place" }
-                errorEventsChannel.send("An unexpected error happened, can't add new place")
+                Logger.e(it) { "An error occurred when trying to add new place" }
+                errorEventsChannel.send(getString(Res.string.add_new_place_error_unexpected))
                 _state.value = _state.value.copy(
                     isSaving = false
                 )

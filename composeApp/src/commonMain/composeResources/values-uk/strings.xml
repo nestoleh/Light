@@ -1,12 +1,75 @@
 <resources>
-    <string name="button_add_place">Додати помешкання</string>
-    <string name="add_place_title">Додати помешкання</string>
-    <string name="field_place_name">Назва</string>
-    <string name="button_save">Зберегти</string>
-    <string name="validator_place_name_empty_error">Назва помешкання не може бути пустою</string>
-    <string name="validator_place_name_exist_error">У Вас уже є помешкання з такою назвою, будь ласка, вкажіть іншу назву</string>
 
+    <!-- COMMON -->
+
+    <string name="common_no_data">Немає даних</string>
+
+    <string name="day_monday_short">Пн</string>
+    <string name="day_tuesday_short">Вт</string>
+    <string name="day_wednesday_short">Ср</string>
+    <string name="day_thursday_short">Чт</string>
+    <string name="day_friday_short">Пт</string>
+    <string name="day_saturday_short">Сб</string>
+    <string name="day_sunday_short">Нд</string>
+    <string name="day_monday">Понеділок</string>
+    <string name="day_tuesday">Вівторок</string>
+    <string name="day_wednesday">Середа</string>
+    <string name="day_thursday">Четвер</string>
+    <string name="day_friday">П\'ятниця</string>
+    <string name="day_saturday">Субота</string>
+    <string name="day_sunday">Неділя</string>
 
     <string name="time_format">HH:mm</string>
-    <string name="time_format_with_date">d MMMM HH:mm</string>
+    <string name="time_format_with_date">HH:mm, MMMM d</string>
+
+    <string name="human_readable_days">%1$d д</string>
+    <string name="human_readable_hours">%1$d год</string>
+    <string name="human_readable_minutes">%1$d хв</string>
+    <string name="human_readable_seconds">%1$d с</string>
+
+    <!-- Status -->
+    <string name="electricity_status_name_on">Увімкнено</string>
+    <string name="electricity_status_name_off">Вимкнено</string>
+    <string name="electricity_status_name_possible_off">Можливо вимкнено</string>
+
+    <!-- Electricity period -->
+    <string name="electricity_period_label_status">Статус: %1$s</string>
+    <string name="electricity_period_label_unlimited">Необмежено</string>
+    <string name="electricity_period_label_percent_left">залишилось %1$s%</string>
+    <string name="electricity_period_label_time_left">це триватиме</string>
+    <string name="electricity_period_no_limits_title">Без обмежень</string>
+    <string name="electricity_period_no_limits_message">Згідно з розкладом, у вас не буде змін доступності електроенергії найближчим часом</string>
+    <string name="electricity_period_next_status_label">Наступний статус</string>
+    <string name="electricity_period_next_status_label_start_at">о %1$s</string>
+
+    <!-- Main screen -->
+    <string name="main_screen_error_schedule">Сталася помилка, перевірте свій розклад</string>
+    <string name="main_screen_error_place_selection">Сталася помилка під час вибору місця, спробуйте ще раз</string>
+    <string name="main_screen_button_add_place">Додати місце</string>
+    <string name="main_screen_no_places_message">У вас ще немає місць.\nДодайте нове!</string>
+
+    <!-- Schedule screen -->
+    <string name="schedule_footer">Кінець тижня</string>
+
+    <!-- Add new place screen -->
+    <string name="add_new_place_error_unexpected">Сталася помилка, не вдалося додати нове місце</string>
+    <string name="add_new_place_title">Додати місце</string>
+    <string name="add_place_field_name">Назва</string>
+    <string name="add_place_button_add">Додати</string>
+
+    <!-- Place settings screen -->
+    <string name="place_settings_button_save">Зберегти</string>
+    <string name="place_settings_delete_dialog_title">Видалити цей будинок?</string>
+    <string name="place_settings_delete_dialog_message">Ви впевнені, що хочете видалити цей будинок? Цю дію не можна скасувати.</string>
+    <string name="place_settings_delete_dialog_button_confirm">Видалити</string>
+    <string name="place_settings_delete_dialog_button_reject">Скасувати</string>
+    <string name="place_settings_schedule_title">Розклад</string>
+    <string name="place_settings_schedule_tips_title">Як створити розклад?</string>
+    <string name="place_settings_schedule_tips_message">Просто натисніть на комірку, щоб змінити її статус, заповніть усі комірки та натисніть Зберегти.</string>
+
+    <!-- Validators -->
+    <!-- Place -->
+    <string name="validator_place_name_empty_error">Назва місця не повинна бути порожньою.</string>
+    <string name="validator_place_name_exist_error">У вас вже є місце з такою назвою, будь ласка, введіть іншу назву.</string>
+
 </resources>

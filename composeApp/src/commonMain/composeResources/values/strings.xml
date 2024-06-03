@@ -1,17 +1,75 @@
 <resources>
-    <string name="button_add_place">Add place</string>
-    <string name="add_place_title">Add place</string>
-    <string name="field_place_name">Name</string>
-    <string name="button_save">Save</string>
-    <string name="button_add">Add</string>
-    <string name="validator_place_name_empty_error">Place name should not be empty</string>
-    <string name="validator_place_name_exist_error">You already have place with this name, please enter another name</string>
+
+    <!-- COMMON -->
+
+    <string name="common_no_data">No data</string>
+
+    <string name="day_monday_short">Mon</string>
+    <string name="day_tuesday_short">Tue</string>
+    <string name="day_wednesday_short">Wed</string>
+    <string name="day_thursday_short">Thu</string>
+    <string name="day_friday_short">Fri</string>
+    <string name="day_saturday_short">Sat</string>
+    <string name="day_sunday_short">Sun</string>
+    <string name="day_monday">Monday</string>
+    <string name="day_tuesday">Tuesday</string>
+    <string name="day_wednesday">Wednesday</string>
+    <string name="day_thursday">Thursday</string>
+    <string name="day_friday">Friday</string>
+    <string name="day_saturday">Saturday</string>
+    <string name="day_sunday">Sunday</string>
+
+    <string name="time_format">hh:mm a</string>
+    <string name="time_format_with_date">hh:mm a, MMM d</string>
 
     <string name="human_readable_days">%1$d d</string>
     <string name="human_readable_hours">%1$d hr</string>
     <string name="human_readable_minutes">%1$d min</string>
     <string name="human_readable_seconds">%1$d s</string>
 
-    <string name="time_format">hh:mm a</string>
-    <string name="time_format_with_date">hh:mm a, MMM d</string>
+    <!-- Status -->
+    <string name="electricity_status_name_on">On</string>
+    <string name="electricity_status_name_off">Off</string>
+    <string name="electricity_status_name_possible_off">Possible Off</string>
+
+    <!-- Electricity period -->
+    <string name="electricity_period_label_status">Status: %1$s</string>
+    <string name="electricity_period_label_unlimited">unlimited</string>
+    <string name="electricity_period_label_percent_left">left %1$s%</string>
+    <string name="electricity_period_label_time_left">it will continue for</string>
+    <string name="electricity_period_no_limits_title">No limits</string>
+    <string name="electricity_period_no_limits_message">According to schedule you don't have any possible electricity status changes in the future</string>
+    <string name="electricity_period_next_status_label">Next status is</string>
+    <string name="electricity_period_next_status_label_start_at">at %1$s</string>
+
+    <!-- Main screen -->
+    <string name="main_screen_error_schedule">An unexpected error occurred, please check you schedule</string>
+    <string name="main_screen_error_place_selection">An error occurred while selecting the place, please try again</string>
+    <string name="main_screen_button_add_place">Add place</string>
+    <string name="main_screen_no_places_message">You don't have any places yet.\nAdd a new one!</string>
+
+    <!-- Schedule screen -->
+    <string name="schedule_footer">End of week</string>
+
+    <!-- Add new place screen -->
+    <string name="add_new_place_error_unexpected">An unexpected error happened, cannot add new place</string>
+    <string name="add_new_place_title">Add place</string>
+    <string name="add_place_field_name">Name</string>
+    <string name="add_place_button_add">Add</string>
+
+    <!-- Place settings screen -->
+    <string name="place_settings_button_save">Save</string>
+    <string name="place_settings_delete_dialog_title">Delete this home?</string>
+    <string name="place_settings_delete_dialog_message">Are you sure you want to delete this home? This action cannot be undone.</string>
+    <string name="place_settings_delete_dialog_button_confirm">Delete</string>
+    <string name="place_settings_delete_dialog_button_reject">Cancel</string>
+    <string name="place_settings_schedule_title">Schedule</string>
+    <string name="place_settings_schedule_tips_title">How to create schedule?</string>
+    <string name="place_settings_schedule_tips_message">Just click on cell to change it status, fill all cells and click Save</string>
+
+    <!-- Validators -->
+    <!-- Place -->
+    <string name="validator_place_name_empty_error">Place name should not be empty</string>
+    <string name="validator_place_name_exist_error">You already have place with this name, please enter another name</string>
+
 </resources>

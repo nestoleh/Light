@@ -10,7 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import light.composeapp.generated.resources.Res
 import light.composeapp.generated.resources.ic_delete
+import light.composeapp.generated.resources.place_settings_delete_dialog_button_confirm
+import light.composeapp.generated.resources.place_settings_delete_dialog_button_reject
+import light.composeapp.generated.resources.place_settings_delete_dialog_message
+import light.composeapp.generated.resources.place_settings_delete_dialog_title
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DeletePlaceDialog(
@@ -32,7 +37,7 @@ fun DeletePlaceDialog(
                     onConfirm()
                 }
             ) {
-                Text("Delete")
+                Text(text = stringResource(Res.string.place_settings_delete_dialog_button_confirm))
             }
         },
         dismissButton = {
@@ -41,14 +46,14 @@ fun DeletePlaceDialog(
                     onDismissRequest()
                 }
             ) {
-                Text("Cancel")
+                Text(text = stringResource(Res.string.place_settings_delete_dialog_button_reject))
             }
         },
         title = {
-            Text("Delete this home?")
+            Text(text = stringResource(Res.string.place_settings_delete_dialog_title))
         },
         text = {
-            Text("Are you sure you want to delete this home? This action cannot be undone.")
+            Text(text = stringResource(Res.string.place_settings_delete_dialog_message))
         }
     )
 }

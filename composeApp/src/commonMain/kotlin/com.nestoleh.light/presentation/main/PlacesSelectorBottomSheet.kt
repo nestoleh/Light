@@ -22,8 +22,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.Place
 import light.composeapp.generated.resources.Res
-import light.composeapp.generated.resources.button_add_place
 import light.composeapp.generated.resources.ic_check
+import light.composeapp.generated.resources.main_screen_button_add_place
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -79,7 +79,7 @@ fun PlacesSelectorBottomSheet(
                         .fillMaxWidth(),
                     onClick = onAddNewPlace
                 ) {
-                    Text(text = stringResource(Res.string.button_add_place))
+                    Text(text = stringResource(Res.string.main_screen_button_add_place))
                 }
             }
         }

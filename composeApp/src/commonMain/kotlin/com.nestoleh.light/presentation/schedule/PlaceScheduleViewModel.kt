@@ -5,28 +5,24 @@ import androidx.lifecycle.viewModelScope
 import com.nestoleh.light.domain.model.ElectricityStatusBlock
 import com.nestoleh.light.domain.usecase.CalculateScheduleAsBlocksUseCase
 import com.nestoleh.light.domain.usecase.GetPlaceUseCase
-import com.nestoleh.light.util.watchFlow
+import com.nestoleh.light.util.everyMinuteChangeFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Duration.Companion.seconds
 
 class PlaceScheduleViewModel(
-    private val placeId: String,
-    private val getPlaceUseCase: GetPlaceUseCase,
+    placeId: String,
+    getPlaceUseCase: GetPlaceUseCase,
     private val calculateScheduleAsBlocksUseCase: CalculateScheduleAsBlocksUseCase
 ) : ViewModel() {
 
     private val _state = combine(
         getPlaceUseCase(GetPlaceUseCase.Parameters(placeId)),
-        watchFlow(1.seconds)
-            .distinctUntilChangedBy { it.toLocalDateTime(TimeZone.currentSystemDefault()).minute }
-            .map { currentTime(it) }
+        everyMinuteChangeFlow().map { currentTime(it) }
     ) { place, currentTime ->
         val weekBlocks = place?.schedule?.let {
             calculateScheduleAsBlocksUseCase.executeSync(it)
@@ -38,7 +34,6 @@ class PlaceScheduleViewModel(
             currentTime = currentTime
         )
     }
-
     val state = _state
         .stateIn(viewModelScope, SharingStarted.Eagerly, PlaceScheduleUIState())
 

@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.ElectricityStatusPeriod
 import com.nestoleh.light.presentation.components.color
+import com.nestoleh.light.presentation.components.statusName
 import com.nestoleh.light.presentation.theme.LightAppColors
 import com.nestoleh.light.util.toHumanReadable
 import com.nestoleh.light.util.watchFlow
@@ -39,6 +40,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import light.composeapp.generated.resources.Res
+import light.composeapp.generated.resources.common_no_data
+import light.composeapp.generated.resources.electricity_period_label_percent_left
+import light.composeapp.generated.resources.electricity_period_label_status
+import light.composeapp.generated.resources.electricity_period_label_time_left
+import light.composeapp.generated.resources.electricity_period_label_unlimited
+import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -84,7 +92,7 @@ private fun UnknownCurrentPeriod(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "No data",
+            text = stringResource(Res.string.common_no_data),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onErrorContainer
         )
@@ -109,7 +117,7 @@ private fun CurrentPeriodUnlimited(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Status: ${period.status}",
+                text = stringResource(Res.string.electricity_period_label_status, period.status.statusName),
                 textAlign = TextAlign.Center,
                 color = LightAppColors.onElectricityStatusColor,
                 style = MaterialTheme.typography.titleMedium
@@ -120,7 +128,7 @@ private fun CurrentPeriodUnlimited(
                     .clip(RoundedCornerShape(50.dp))
                     .background(MaterialTheme.colorScheme.tertiaryContainer)
                     .padding(vertical = 1.dp, horizontal = 8.dp),
-                text = "unlimited",
+                text = stringResource(Res.string.electricity_period_label_unlimited),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -172,7 +180,7 @@ private fun CurrentPeriodLimited(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Status: ${period.status}",
+                    text = stringResource(Res.string.electricity_period_label_status, period.status.statusName),
                     textAlign = TextAlign.Center,
                     color = LightAppColors.onElectricityStatusColor,
                     style = MaterialTheme.typography.titleMedium
@@ -182,13 +190,13 @@ private fun CurrentPeriodLimited(
                         .clip(RoundedCornerShape(50.dp))
                         .background(MaterialTheme.colorScheme.tertiaryContainer)
                         .padding(vertical = 1.dp, horizontal = 8.dp),
-                    text = "left ${(timeLeft * 100).toInt()}%",
+                    text = stringResource(Res.string.electricity_period_label_percent_left, (timeLeft * 100).toInt()),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall
                 )
                 Spacer(modifier = Modifier.size(32.dp))
                 Text(
-                    text = "it will continue for",
+                    text = stringResource(Res.string.electricity_period_label_time_left),
                     textAlign = TextAlign.Center,
                     color = LightAppColors.onElectricityStatusColor
                 )

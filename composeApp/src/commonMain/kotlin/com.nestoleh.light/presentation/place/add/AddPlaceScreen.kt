@@ -33,14 +33,13 @@ import com.nestoleh.light.domain.model.Place
 import com.nestoleh.light.presentation.components.LockedProgressButton
 import com.nestoleh.light.presentation.components.ToolbarIcon
 import com.nestoleh.light.presentation.components.ToolbarTitle
-import com.nestoleh.light.util.HandleErrorsFlow
+import com.nestoleh.light.presentation.components.util.HandleErrorsFlow
 import com.nestoleh.light.util.koinViewModel
 import kotlinx.coroutines.launch
 import light.composeapp.generated.resources.Res
-import light.composeapp.generated.resources.add_place_title
-import light.composeapp.generated.resources.button_add
-import light.composeapp.generated.resources.button_save
-import light.composeapp.generated.resources.field_place_name
+import light.composeapp.generated.resources.add_new_place_title
+import light.composeapp.generated.resources.add_place_button_add
+import light.composeapp.generated.resources.add_place_field_name
 import light.composeapp.generated.resources.ic_close
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -90,7 +89,7 @@ fun AddPlaceScreenContent(
                 title = {
                     ToolbarTitle(
                         modifier = Modifier.padding(end = 48.dp),
-                        title = stringResource(Res.string.add_place_title)
+                        title = stringResource(Res.string.add_new_place_title)
                     )
                 },
                 navigationIcon = {
@@ -120,7 +119,7 @@ fun AddPlaceScreenContent(
             val keyboardController = LocalSoftwareKeyboardController.current
             val scope = rememberCoroutineScope()
             LockedProgressButton(
-                text = stringResource(Res.string.button_add),
+                text = stringResource(Res.string.add_place_button_add),
                 isInProgress = state.value.isSaving,
                 onClick = {
                     scope.launch {
@@ -150,7 +149,7 @@ private fun PlaceNameField(
             }
         },
         label = {
-            Text(stringResource(Res.string.field_place_name))
+            Text(stringResource(Res.string.add_place_field_name))
         },
         isError = !nameError.isNullOrEmpty(),
         singleLine = true,

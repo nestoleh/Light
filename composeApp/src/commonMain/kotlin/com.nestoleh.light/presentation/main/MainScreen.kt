@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.LocalContentColor
@@ -41,18 +43,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.Place
 import com.nestoleh.light.presentation.components.ToolbarIcon
+import com.nestoleh.light.presentation.components.util.HandleErrorsFlow
 import com.nestoleh.light.presentation.main.components.CurrentElectricityPeriod
 import com.nestoleh.light.presentation.main.components.NextElectricityPeriod
 import com.nestoleh.light.presentation.main.components.NoNextElectricityPeriod
-import com.nestoleh.light.util.HandleErrorsFlow
 import com.nestoleh.light.util.koinViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import light.composeapp.generated.resources.Res
-import light.composeapp.generated.resources.button_add_place
 import light.composeapp.generated.resources.ic_date_range
 import light.composeapp.generated.resources.ic_down
 import light.composeapp.generated.resources.ic_settings
+import light.composeapp.generated.resources.main_screen_button_add_place
+import light.composeapp.generated.resources.main_screen_no_places_message
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -139,13 +142,13 @@ fun MainScreenContent(
                 is SelectedPlaceState.None -> {
                     FloatingActionButton(
                         modifier = Modifier
-                            .padding(bottom = 48.dp)
+                            .padding(bottom = 36.dp)
                             .height(54.dp)
                             .widthIn(min = 200.dp),
                         onClick = onAddNewPlace
                     ) {
                         Text(
-                            text = stringResource(Res.string.button_add_place)
+                            text = stringResource(Res.string.main_screen_button_add_place)
                         )
                     }
                 }
@@ -198,13 +201,14 @@ fun MainScreenContent(
             modifier = Modifier
                 .padding(paddings)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(bottom = 102.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             when (selectedPlaceState) {
                 SelectedPlaceState.None -> {
                     Text(
-                        text = "You don't have any places yet. \nAdd a new one!",
+                        text = stringResource(Res.string.main_screen_no_places_message),
                         textAlign = TextAlign.Center,
                     )
                 }

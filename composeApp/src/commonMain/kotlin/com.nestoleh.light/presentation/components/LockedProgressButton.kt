@@ -3,6 +3,7 @@ package com.nestoleh.light.presentation.components
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -19,6 +20,7 @@ fun LockedProgressButton(
 ) {
     Button(
         modifier = Modifier
+            .widthIn(min = 200.dp)
             .animateContentSize(),
         enabled = !isInProgress,
         onClick = onClick
