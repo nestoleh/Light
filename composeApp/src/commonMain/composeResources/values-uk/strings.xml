@@ -5,4 +5,8 @@
     <string name="button_save">Зберегти</string>
     <string name="validator_place_name_empty_error">Назва помешкання не може бути пустою</string>
     <string name="validator_place_name_exist_error">У Вас уже є помешкання з такою назвою, будь ласка, вкажіть іншу назву</string>
+
+
+    <string name="time_format">HH:mm</string>
+    <string name="time_format_with_date">d MMMM HH:mm</string>
 </resources>

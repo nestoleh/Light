@@ -32,7 +32,11 @@ suspend fun Duration.toHumanReadable(
             }
             val start = components.indexOfFirst { !it.isEmpty }
             val end = components.indexOfLast { !it.isEmpty }
-            components.subList(start, end + 1).joinToString(separator = " ") { it.readableValue }
+            if (start < 0 || end < 0) {
+                ""
+            } else {
+                components.subList(start, end + 1).joinToString(separator = " ") { it.readableValue }
+            }
         }
     }
 }

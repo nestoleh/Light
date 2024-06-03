@@ -43,9 +43,11 @@ import com.nestoleh.light.presentation.components.shortDayName
 import com.nestoleh.light.util.HandleErrorsFlow
 import com.nestoleh.light.util.koinViewModel
 import light.composeapp.generated.resources.Res
+import light.composeapp.generated.resources.button_save
 import light.composeapp.generated.resources.ic_close
 import light.composeapp.generated.resources.ic_delete
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.core.parameter.parametersOf
 
 @Composable
@@ -133,6 +135,7 @@ fun PlaceSettingsScreenContent(
                 Spacer(modifier = Modifier.height(32.dp))
                 Spacer(modifier = Modifier.weight(1f))
                 LockedProgressButton(
+                    text = stringResource(Res.string.button_save),
                     isInProgress = state.isSaving,
                     onClick = {
                         onAction(PlaceSettingsAction.Save)

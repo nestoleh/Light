@@ -2,18 +2,16 @@ package com.nestoleh.light.presentation.schedule
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.touchlab.kermit.Logger
 import com.nestoleh.light.domain.model.ElectricityStatusBlock
-import com.nestoleh.light.domain.model.Schedule
 import com.nestoleh.light.domain.usecase.CalculateScheduleAsBlocksUseCase
 import com.nestoleh.light.domain.usecase.GetPlaceUseCase
-import kotlinx.coroutines.delay
+import com.nestoleh.light.util.watchFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.seconds
@@ -26,12 +24,9 @@ class PlaceScheduleViewModel(
 
     private val _state = combine(
         getPlaceUseCase(GetPlaceUseCase.Parameters(placeId)),
-        flow {
-            while (true) {
-                emit(currentTime())
-                delay(1.seconds)
-            }
-        }
+        watchFlow(1.seconds)
+            .distinctUntilChangedBy { it.toLocalDateTime(TimeZone.currentSystemDefault()).minute }
+            .map { currentTime(it) }
     ) { place, currentTime ->
         val weekBlocks = place?.schedule?.let {
             calculateScheduleAsBlocksUseCase.executeSync(it)
@@ -55,44 +50,8 @@ class PlaceScheduleViewModel(
         return syncedIndices
     }
 
-    private fun Schedule.asBlocks(): List<List<ElectricityStatusBlock>> {
-        return weekSchedule.map { daySchedule ->
-            val dayBlocks = mutableListOf<ElectricityStatusBlock>()
-            if (daySchedule.isNotEmpty()) {
-                var blockStart = 0
-                var blockEnd = 1
-                var blockStatus = daySchedule.first()
-                for (i in 1 until daySchedule.size) {
-                    val status = daySchedule[i]
-                    if (status == blockStatus) {
-                        blockEnd = i + 1
-                    } else {
-                        dayBlocks.add(
-                            ElectricityStatusBlock(
-                                hourStart = blockStart,
-                                hourEnd = blockEnd,
-                                status = blockStatus
-                            )
-                        )
-                        blockStart = i
-                        blockEnd = i + 1
-                        blockStatus = status
-                    }
-                }
-                dayBlocks.add(
-                    ElectricityStatusBlock(
-                        hourStart = blockStart,
-                        hourEnd = blockEnd,
-                        status = blockStatus
-                    )
-                )
-            }
-            dayBlocks
-        }
-    }
-
-    private fun currentTime(): PlaceScheduleUIState.CurrentTimeState {
-        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    private fun currentTime(instant: Instant): PlaceScheduleUIState.CurrentTimeState {
+        val now = instant.toLocalDateTime(TimeZone.currentSystemDefault())
         return PlaceScheduleUIState.CurrentTimeState(
             dayNumber = now.dayOfWeek.ordinal,
             hours = now.hour,

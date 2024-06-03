@@ -3,6 +3,7 @@
     <string name="add_place_title">Add place</string>
     <string name="field_place_name">Name</string>
     <string name="button_save">Save</string>
+    <string name="button_add">Add</string>
     <string name="validator_place_name_empty_error">Place name should not be empty</string>
     <string name="validator_place_name_exist_error">You already have place with this name, please enter another name</string>
 
@@ -10,4 +11,7 @@
     <string name="human_readable_hours">%1$d hr</string>
     <string name="human_readable_minutes">%1$d min</string>
     <string name="human_readable_seconds">%1$d s</string>
+
+    <string name="time_format">hh:mm a</string>
+    <string name="time_format_with_date">hh:mm a, MMM d</string>
 </resources>

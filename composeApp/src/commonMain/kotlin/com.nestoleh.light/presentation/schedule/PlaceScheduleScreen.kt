@@ -31,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
@@ -201,7 +202,7 @@ private fun ScheduleScreenContent(
                 }
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    state = lazyListState
+                    state = lazyListState,
                 ) {
                     state.value.weekBlocks.forEachIndexed { dayIndex, daySchedule ->
                         item {
@@ -221,6 +222,26 @@ private fun ScheduleScreenContent(
                             } else {
                                 ElectricityStatus(block)
                             }
+                        }
+                    }
+
+                    item {
+                        // footer element, required because of bug in scrollToItem function
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 64.dp)
+                                .fillMaxWidth()
+                                .height(54.dp),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(bottom = 8.dp)
+                                    .alpha(0.5f),
+                                text = "End of week",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                 }

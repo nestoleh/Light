@@ -10,14 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import light.composeapp.generated.resources.Res
-import light.composeapp.generated.resources.button_save
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LockedProgressButton(
     isInProgress: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    text: String
 ) {
     Button(
         modifier = Modifier
@@ -25,7 +23,7 @@ fun LockedProgressButton(
         enabled = !isInProgress,
         onClick = onClick
     ) {
-        Text(text = stringResource(Res.string.button_save))
+        Text(text = text)
         if (isInProgress) {
             CircularProgressIndicator(
                 strokeCap = StrokeCap.Round,

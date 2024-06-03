@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.LocalContentColor
@@ -41,13 +39,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.nestoleh.light.domain.model.ElectricityStatusBlock
 import com.nestoleh.light.domain.model.Place
 import com.nestoleh.light.presentation.components.ToolbarIcon
-import com.nestoleh.light.presentation.components.color
-import com.nestoleh.light.presentation.components.hourName
 import com.nestoleh.light.presentation.main.components.CurrentElectricityPeriod
-import com.nestoleh.light.presentation.theme.LightAppColors
+import com.nestoleh.light.presentation.main.components.NextElectricityPeriod
+import com.nestoleh.light.presentation.main.components.NoNextElectricityPeriod
 import com.nestoleh.light.util.HandleErrorsFlow
 import com.nestoleh.light.util.koinViewModel
 import kotlinx.coroutines.delay
@@ -218,6 +214,18 @@ fun MainScreenContent(
                     CurrentElectricityPeriod(
                         period = selectedPlaceState.currentPeriod
                     )
+                    if (selectedPlaceState.futurePeriods.isEmpty()) {
+                        NoNextElectricityPeriod(
+                            modifier = Modifier.padding(top = 16.dp),
+                        )
+                    } else {
+                        selectedPlaceState.futurePeriods.forEach {
+                            NextElectricityPeriod(
+                                modifier = Modifier.padding(top = 16.dp),
+                                period = it
+                            )
+                        }
+                    }
                     Spacer(modifier = Modifier.height(32.dp))
                 }
             }
@@ -249,27 +257,5 @@ fun MainScreenContent(
                 onDismissRequest = { showPlacesBottomSheet = false }
             )
         }
-    }
-}
-
-@Composable
-private fun NextElectricityBlock(
-    block: ElectricityStatusBlock
-) {
-    Card(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = block.status.color,
-            contentColor = LightAppColors.onElectricityStatusColor,
-        )
-    ) {
-        Text(
-            modifier = Modifier.padding(16.dp),
-            text = "Next status change to: ${block.status}\nwill happen at ${block.hourStart.hourName()}",
-            textAlign = TextAlign.Start,
-            color = LightAppColors.onElectricityStatusColor
-        )
     }
 }

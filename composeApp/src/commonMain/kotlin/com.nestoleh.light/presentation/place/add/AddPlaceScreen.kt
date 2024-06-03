@@ -38,6 +38,8 @@ import com.nestoleh.light.util.koinViewModel
 import kotlinx.coroutines.launch
 import light.composeapp.generated.resources.Res
 import light.composeapp.generated.resources.add_place_title
+import light.composeapp.generated.resources.button_add
+import light.composeapp.generated.resources.button_save
 import light.composeapp.generated.resources.field_place_name
 import light.composeapp.generated.resources.ic_close
 import org.jetbrains.compose.resources.painterResource
@@ -118,6 +120,7 @@ fun AddPlaceScreenContent(
             val keyboardController = LocalSoftwareKeyboardController.current
             val scope = rememberCoroutineScope()
             LockedProgressButton(
+                text = stringResource(Res.string.button_add),
                 isInProgress = state.value.isSaving,
                 onClick = {
                     scope.launch {

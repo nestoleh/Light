@@ -23,13 +23,14 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
-class CalculateNearestElectricityPeriods2UseCase(
+class CalculateNearestElectricityPeriodsUseCase(
     private val dispatcher: CoroutineDispatcher
 ) : FlowUseCase<Schedule, NearestElectricityPeriods?>() {
+
     override fun doWork(params: Schedule): Flow<NearestElectricityPeriods?> {
         return flowOf(params.toIndependentElectricityStatusBlocks())
             .flatMapLatest { blocks ->
-                Logger.d { "Blocks -> [${blocks.size}] --> $blocks" }
+                Logger.d { "Original blocks -> [${blocks.size}] --> $blocks" }
                 if (blocks.size == 1) {
                     flowOf(
                         NearestElectricityPeriods(
@@ -47,38 +48,30 @@ class CalculateNearestElectricityPeriods2UseCase(
                             val currentDay = localNow.dayOfWeek.ordinal
                             val currentHour = localNow.hour
                             val currentBlockIndex = blocks.findBlockIndexFor(currentDay, currentHour)
-                            if (currentBlockIndex >= 0) {
-                                val block = blocks[currentBlockIndex]
-                                val circularBlock =
-                                    if (blocks.size > 1
-                                        && currentBlockIndex == blocks.size - 1
-                                        && blocks.first().status == block.status
-                                    ) {
-                                        blocks.first()
-                                    } else {
-                                        null
-                                    }
-                                val additionalDaysFromCircularBlock = circularBlock?.dayEnd?.plus(1) ?: 0
-                                val current = ElectricityStatusPeriod.Limited(
-                                    periodStart = (now - (currentDay - block.dayStart).days)
-                                        .toLocalDateTime(TimeZone.currentSystemDefault())
-                                        .setupWithHour(block.hourStart),
-                                    periodEnd = (now + (block.dayEnd - currentDay + additionalDaysFromCircularBlock).days)
-                                        .toLocalDateTime(TimeZone.currentSystemDefault())
-                                        .setupWithHour(circularBlock?.hourEnd ?: block.hourEnd),
-                                    status = block.status
-                                )
-                                NearestElectricityPeriods(
-                                    current = current,
-                                    future = emptyList() // TODO: count future blocks
-                                )
-                            } else {
-                                null
-                            }
+                            val reformattedBlocks = blocks.reformatStartingFrom(currentBlockIndex)
+                            Logger.d { "Reformatted blocks -> [${reformattedBlocks.size}] --> $reformattedBlocks" }
+                            NearestElectricityPeriods(
+                                current = reformattedBlocks[0].toElectricityStatusPeriod(now),
+                                future = reformattedBlocks.subList(1, 3).map { it.toElectricityStatusPeriod(now) }
+                            )
                         }
                 }
             }
             .flowOn(dispatcher)
+    }
+
+    private fun IndependentElectricityStatusBlock.toElectricityStatusPeriod(
+        now: Instant
+    ): ElectricityStatusPeriod.Limited {
+        return ElectricityStatusPeriod.Limited(
+            periodStart = (now + this.dayStart.days)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .setupWithHour(this.hourStart),
+            periodEnd = (now + this.dayEnd.days)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .setupWithHour(this.hourEnd),
+            status = this.status
+        )
     }
 
     private fun LocalDateTime.setupWithHour(hour: Int): LocalDateTime {
@@ -90,10 +83,58 @@ class CalculateNearestElectricityPeriods2UseCase(
         return this.date.atTime(localTime)
     }
 
-    private fun List<IndependentElectricityStatusBlock>.findBlockIndexFor(
-        day: Int,
-        hour: Int
-    ): Int {
+    private fun List<IndependentElectricityStatusBlock>.reformatStartingFrom(
+        index: Int
+    ): List<IndependentElectricityStatusBlock> {
+        return if (index == 0) {
+            val first = this.first()
+            val last = this.last()
+            if (last.status == first.status) {
+                this.toMutableList().apply {
+                    set(
+                        index = 0,
+                        element = first.copy(
+                            hourStart = last.hourStart,
+                            dayStart = first.dayStart - (7 - last.dayStart)
+                        )
+                    )
+                }
+            } else {
+                this
+            }
+        } else {
+            val stickEndWithStart = index != 0 && this.last().status == this.first().status
+            val daysShift = this[index].dayStart
+            val newList = mutableListOf<IndependentElectricityStatusBlock>()
+            newList.addAll(this.subList(index, if (stickEndWithStart) this.size - 1 else this.size))
+            if (stickEndWithStart) {
+                val first = this.first()
+                val last = this.last()
+                newList.add(
+                    last.copy(
+                        dayEnd = last.dayEnd + first.dayEnd + 1,
+                        hourEnd = first.hourEnd
+                    )
+                )
+            }
+            newList.addAll(
+                this.subList(if (stickEndWithStart) 1 else 0, index)
+                    .map { block ->
+                        block.copy(
+                            dayStart = block.dayStart + 7,
+                            dayEnd = block.dayEnd + 7
+                        )
+                    })
+            newList.map {
+                it.copy(
+                    dayStart = it.dayStart - daysShift,
+                    dayEnd = it.dayEnd - daysShift
+                )
+            }
+        }
+    }
+
+    private fun List<IndependentElectricityStatusBlock>.findBlockIndexFor(day: Int, hour: Int): Int {
         return this.indexOfFirst { block ->
             (block.dayStart < day || (block.dayStart == day && block.hourStart <= hour))
                     && (block.dayEnd > day || (block.dayEnd == day && hour < block.hourEnd))
@@ -130,12 +171,12 @@ class CalculateNearestElectricityPeriods2UseCase(
         }
         return blocks
     }
-}
 
-data class IndependentElectricityStatusBlock(
-    val dayStart: Int,
-    val hourStart: Int,
-    val dayEnd: Int,
-    val hourEnd: Int,
-    val status: ElectricityStatus
-)
+    private data class IndependentElectricityStatusBlock(
+        val dayStart: Int,
+        val hourStart: Int,
+        val dayEnd: Int,
+        val hourEnd: Int,
+        val status: ElectricityStatus
+    )
+}

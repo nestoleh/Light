@@ -2,6 +2,7 @@ package com.nestoleh.light.presentation.main.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
@@ -75,7 +77,8 @@ private fun UnknownCurrentPeriod(
 ) {
     Box(
         modifier = modifier
-            .size(circleSizeDp.dp)
+            .padding(((circleSizeOutDp - circleSizeInDp) / 2).dp)
+            .size(circleSizeInDp.dp)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.errorContainer),
         contentAlignment = Alignment.Center
@@ -96,7 +99,8 @@ private fun CurrentPeriodUnlimited(
     val color by animateColorAsState(period.status.color)
     Box(
         modifier = modifier
-            .size(circleSizeDp.dp)
+            .padding(((circleSizeOutDp - circleSizeInDp) / 2).dp)
+            .size(circleSizeInDp.dp)
             .clip(CircleShape)
             .background(color),
         contentAlignment = Alignment.Center
@@ -134,7 +138,11 @@ private fun CurrentPeriodLimited(
         mutableStateOf("")
     }
     var timeLeft by rememberSaveable { mutableStateOf(0f) }
-    val animatedTimeLeft by animateFloatAsState(timeLeft)
+    val animatedTimeLeft by animateFloatAsState(
+        targetValue = timeLeft,
+        animationSpec = tween(500),
+    )
+
     LaunchedEffect(period) {
         watchFlow(1.seconds)
             .onEach {
@@ -142,7 +150,7 @@ private fun CurrentPeriodLimited(
                 val localPeriodEnd = period.periodEnd.toInstant(TimeZone.currentSystemDefault())
                 val duration: Duration =
                     localPeriodEnd - Clock.System.now()
-                durationLeft.value = duration.toHumanReadable(isShowSeconds = false)
+                durationLeft.value = duration.toHumanReadable(isShowSeconds = duration < 1.minutes)
                 val fullPeriod = localPeriodEnd - localPeriodStart
                 timeLeft = duration.inWholeMilliseconds.toFloat() / fullPeriod.inWholeMilliseconds.toFloat()
             }
@@ -150,12 +158,12 @@ private fun CurrentPeriodLimited(
     }
     Box(
         modifier = modifier
-            .size(300.dp),
+            .size(circleSizeOutDp.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = modifier
-                .size(circleSizeDp.dp)
+                .size(circleSizeInDp.dp)
                 .clip(CircleShape)
                 .background(color),
             contentAlignment = Alignment.Center
@@ -219,4 +227,5 @@ private fun CurrentPeriodLimited(
     }
 }
 
-private const val circleSizeDp = 250
+private const val circleSizeInDp = 250
+private const val circleSizeOutDp = 300
