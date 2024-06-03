@@ -59,6 +59,7 @@ import com.nestoleh.light.presentation.components.util.animateScrollItemToCenter
 import com.nestoleh.light.presentation.components.util.findFirstFullyVisibleItemIndex
 import com.nestoleh.light.presentation.components.util.findLastFullyVisibleItemIndex
 import com.nestoleh.light.presentation.components.util.scrollItemToCenter
+import com.nestoleh.light.presentation.theme.DomainTheme
 import com.nestoleh.light.util.koinViewModel
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -328,6 +329,7 @@ private fun CurrentElectricityStatus(
     minute: Int,
 ) {
     val textMeasurer = rememberTextMeasurer()
+    val scheduleCurrentTimeColor = DomainTheme.colorScheme.scheduleCurrentTime
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -346,7 +348,7 @@ private fun CurrentElectricityStatus(
                         text = "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}",
                         style = TextStyle(
                             fontSize = 12.sp,
-                            color = Color.Red,
+                            color = scheduleCurrentTimeColor
                         ),
                         topLeft = Offset(
                             x = 8.dp.toPx(),
@@ -354,7 +356,7 @@ private fun CurrentElectricityStatus(
                         )
                     )
                     drawRoundRect(
-                        color = Color.Red,
+                        color = scheduleCurrentTimeColor,
                         topLeft = Offset(0f, yShift),
                         size = Size(size.width, 1.dp.toPx()),
                         cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx())

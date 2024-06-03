@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.ElectricityStatusPeriod
 import com.nestoleh.light.presentation.components.color
 import com.nestoleh.light.presentation.components.statusName
-import com.nestoleh.light.presentation.theme.LightAppColors
+import com.nestoleh.light.presentation.theme.DomainTheme
 import com.nestoleh.light.util.toHumanReadable
 import com.nestoleh.light.util.watchFlow
 import kotlinx.coroutines.flow.launchIn
@@ -119,7 +119,7 @@ private fun CurrentPeriodUnlimited(
             Text(
                 text = stringResource(Res.string.electricity_period_label_status, period.status.statusName),
                 textAlign = TextAlign.Center,
-                color = LightAppColors.onElectricityStatusColor,
+                color = DomainTheme.colorScheme.onElectricityStatusColor,
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.size(32.dp))
@@ -145,7 +145,7 @@ private fun CurrentPeriodLimited(
     val durationLeft = remember {
         mutableStateOf("")
     }
-    var timeLeft by rememberSaveable { mutableStateOf(0f) }
+    var timeLeft by rememberSaveable { mutableStateOf(1f) }
     val animatedTimeLeft by animateFloatAsState(
         targetValue = timeLeft,
         animationSpec = tween(500),
@@ -182,7 +182,7 @@ private fun CurrentPeriodLimited(
                 Text(
                     text = stringResource(Res.string.electricity_period_label_status, period.status.statusName),
                     textAlign = TextAlign.Center,
-                    color = LightAppColors.onElectricityStatusColor,
+                    color = DomainTheme.colorScheme.onElectricityStatusColor,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
@@ -198,7 +198,7 @@ private fun CurrentPeriodLimited(
                 Text(
                     text = stringResource(Res.string.electricity_period_label_time_left),
                     textAlign = TextAlign.Center,
-                    color = LightAppColors.onElectricityStatusColor
+                    color = DomainTheme.colorScheme.onElectricityStatusColor
                 )
                 Spacer(modifier = Modifier.size(4.dp))
                 Text(

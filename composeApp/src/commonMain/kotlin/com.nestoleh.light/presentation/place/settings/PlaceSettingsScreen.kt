@@ -49,6 +49,7 @@ import com.nestoleh.light.presentation.components.hourName
 import com.nestoleh.light.presentation.components.shortDayName
 import com.nestoleh.light.presentation.components.statusName
 import com.nestoleh.light.presentation.components.util.HandleErrorsFlow
+import com.nestoleh.light.presentation.theme.DomainTheme
 import com.nestoleh.light.presentation.theme.LightAppColors
 import com.nestoleh.light.util.koinViewModel
 import light.composeapp.generated.resources.Res
@@ -357,7 +358,7 @@ private fun RowScope.StatusExplanation(
             text = status.statusName,
             maxLines = 2,
             textAlign = TextAlign.Center,
-            color = LightAppColors.onElectricityStatusColor,
+            color = DomainTheme.colorScheme.onElectricityStatusColor,
             style = MaterialTheme.typography.labelMedium,
         )
     }

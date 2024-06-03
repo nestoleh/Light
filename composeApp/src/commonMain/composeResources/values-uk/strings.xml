@@ -20,7 +20,7 @@
     <string name="day_sunday">Неділя</string>
 
     <string name="time_format">HH:mm</string>
-    <string name="time_format_with_date">HH:mm, MMMM d</string>
+    <string name="time_format_with_date">HH:mm, d MMMM</string>
 
     <string name="human_readable_days">%1$d д</string>
     <string name="human_readable_hours">%1$d год</string>

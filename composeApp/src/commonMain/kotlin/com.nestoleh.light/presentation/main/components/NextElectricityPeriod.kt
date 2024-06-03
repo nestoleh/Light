@@ -15,11 +15,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nestoleh.light.domain.model.ElectricityStatusPeriod
 import com.nestoleh.light.presentation.components.color
 import com.nestoleh.light.presentation.components.statusName
-import com.nestoleh.light.presentation.theme.LightAppColors
+import com.nestoleh.light.presentation.theme.DomainTheme
 import com.nestoleh.light.util.formatDate
 import com.nestoleh.light.util.isToday
 import kotlinx.datetime.TimeZone
@@ -46,7 +47,7 @@ fun NextElectricityPeriod(
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = period.status.color,
-            contentColor = LightAppColors.onElectricityStatusColor,
+            contentColor = DomainTheme.colorScheme.onElectricityStatusColor,
         ),
     ) {
         val date = period.periodStart.toInstant(TimeZone.currentSystemDefault())
@@ -63,7 +64,7 @@ fun NextElectricityPeriod(
                     modifier = Modifier,
                     text = stringResource(Res.string.electricity_period_next_status_label),
                     style = MaterialTheme.typography.titleMedium,
-                    color = LightAppColors.onElectricityStatusColor
+                    color = DomainTheme.colorScheme.onElectricityStatusColor
                 )
                 Text(
                     modifier = Modifier
@@ -73,13 +74,15 @@ fun NextElectricityPeriod(
                         .padding(vertical = 1.dp, horizontal = 8.dp),
                     text = period.status.statusName,
                     color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             Text(
                 modifier = Modifier,
                 text = stringResource(Res.string.electricity_period_next_status_label_start_at, startDateFormatted),
-                color = LightAppColors.onElectricityStatusColor,
+                color = DomainTheme.colorScheme.onElectricityStatusColor,
                 style = MaterialTheme.typography.labelMedium,
             )
         }

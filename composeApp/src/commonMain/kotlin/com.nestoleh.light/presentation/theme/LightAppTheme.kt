@@ -12,6 +12,11 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.nestoleh.light.presentation.theme.LightAppColors.electricityStatusOffDark
+import com.nestoleh.light.presentation.theme.LightAppColors.electricityStatusOnDark
+import com.nestoleh.light.presentation.theme.LightAppColors.electricityStatusPossibleOffDark
+import com.nestoleh.light.presentation.theme.LightAppColors.onElectricityStatusColorDark
+import com.nestoleh.light.presentation.theme.LightAppColors.scheduleCurrentTimeDark
 
 private val lightScheme = with(LightAppColors) {
     lightColorScheme(
@@ -53,7 +58,6 @@ private val lightScheme = with(LightAppColors) {
     )
 }
 
-
 private val darkScheme = with(LightAppColors) {
     darkColorScheme(
         primary = primaryDark,
@@ -94,6 +98,16 @@ private val darkScheme = with(LightAppColors) {
     )
 }
 
+private val lightDomainColorScheme = defaultDomainColorScheme
+
+private val darkDomainColorScheme = DomainColorScheme(
+    electricityStatusOn = electricityStatusOnDark,
+    electricityStatusOff = electricityStatusOffDark,
+    electricityStatusPossibleOff = electricityStatusPossibleOffDark,
+    onElectricityStatusColor = onElectricityStatusColorDark,
+    scheduleCurrentTime = scheduleCurrentTimeDark
+)
+
 @Composable
 fun LightAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -105,17 +119,22 @@ fun LightAppTheme(
         colorScheme = colorScheme,
         typography = lightAppTypography(),
         content = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .windowInsetsPadding(WindowInsets.safeDrawing)
+            DomainTheme(
+                colorScheme = if (darkTheme) darkDomainColorScheme else lightDomainColorScheme
             ) {
-                content()
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .windowInsetsPadding(WindowInsets.safeDrawing)
+                ) {
+                    content()
+                }
             }
         }
     )
 }
+
 
 @Composable
 expect fun PlatformThemeConfiguration(

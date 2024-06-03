@@ -3,12 +3,23 @@ package com.nestoleh.light.presentation.theme
 import androidx.compose.ui.graphics.Color
 
 object LightAppColors {
-    val electricityStatusOn = Color(0xFF37A369)
-    val electricityStatusOff = Color(0xFFBA5B4D)
-    val electricityStatusPossibleOff = Color(0xFFFFDE3F)
-    val onElectricityStatusColor = Color(0xFF000000)
 
-    // THEME COLORS
+    // LIGHT APP THEME COLORS
+    // light
+    val electricityStatusOnLight = Color(0xFF37A369)
+    val electricityStatusOffLight = Color(0xFFBA5B4D)
+    val electricityStatusPossibleOffLight = Color(0xFFFFDE3F)
+    val onElectricityStatusColorLight = Color(0xFF000000)
+    val scheduleCurrentTimeLight = Color(0xFFFF0000)
+
+    // dark
+    val electricityStatusOnDark = Color(0xFF276A46)
+    val electricityStatusOffDark = Color(0xFF974F44)
+    val electricityStatusPossibleOffDark = Color(0xFF9B8511)
+    val onElectricityStatusColorDark = Color(0xFFFFFFFF)
+    val scheduleCurrentTimeDark = Color(0xFFFF5454)
+
+    // MATERIAL THEME COLORS
     // light
     val primaryLight = Color(0xFF6D5E0F)
     val onPrimaryLight = Color(0xFFFFFFFF)

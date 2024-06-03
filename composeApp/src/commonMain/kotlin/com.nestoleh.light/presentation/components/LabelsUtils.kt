@@ -3,7 +3,7 @@ package com.nestoleh.light.presentation.components
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.nestoleh.light.domain.model.ElectricityStatus
-import com.nestoleh.light.presentation.theme.LightAppColors
+import com.nestoleh.light.presentation.theme.DomainTheme
 import light.composeapp.generated.resources.Res
 import light.composeapp.generated.resources.day_friday
 import light.composeapp.generated.resources.day_friday_short
@@ -61,10 +61,11 @@ fun Int.hourName(): String {
 }
 
 val ElectricityStatus.color: Color
+    @Composable
     get() = when (this) {
-        ElectricityStatus.On -> LightAppColors.electricityStatusOn
-        ElectricityStatus.Off -> LightAppColors.electricityStatusOff
-        ElectricityStatus.PossibleOff -> LightAppColors.electricityStatusPossibleOff
+        ElectricityStatus.On -> DomainTheme.colorScheme.electricityStatusOn
+        ElectricityStatus.Off -> DomainTheme.colorScheme.electricityStatusOff
+        ElectricityStatus.PossibleOff -> DomainTheme.colorScheme.electricityStatusPossibleOff
     }
 
 val ElectricityStatus.statusName: String
