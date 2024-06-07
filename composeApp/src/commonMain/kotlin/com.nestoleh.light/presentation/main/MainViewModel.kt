@@ -59,9 +59,9 @@ class MainViewModel(
                         }
                 }
             }
-            .onEach { place ->
+            .onEach { state ->
                 _state.value = _state.value.copy(
-                    selectedPlaceState = place
+                    selectedPlaceState = state
                 )
             }
             .launchIn(viewModelScope)

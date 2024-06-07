@@ -30,7 +30,7 @@
     <!-- Status -->
     <string name="electricity_status_name_on">On</string>
     <string name="electricity_status_name_off">Off</string>
-    <string name="electricity_status_name_possible_off">Possible Off</string>
+    <string name="electricity_status_name_possible_off">Possible\u00A0Off</string>
 
     <!-- Electricity period -->
     <string name="electricity_period_label_status">Status: %1$s</string>

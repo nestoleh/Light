@@ -114,6 +114,7 @@ private fun CurrentPeriodUnlimited(
         contentAlignment = Alignment.Center
     ) {
         Column(
+            modifier = Modifier.padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -177,9 +178,11 @@ private fun CurrentPeriodLimited(
             contentAlignment = Alignment.Center
         ) {
             Column(
+                modifier = Modifier.padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     text = stringResource(Res.string.electricity_period_label_status, period.status.statusName),
                     textAlign = TextAlign.Center,
                     color = DomainTheme.colorScheme.onElectricityStatusColor,

@@ -6,10 +6,9 @@ import com.nestoleh.light.domain.model.ElectricityStatus
 import com.nestoleh.light.domain.model.ElectricityStatusPeriod
 import com.nestoleh.light.domain.model.NearestElectricityPeriods
 import com.nestoleh.light.domain.model.Schedule
-import com.nestoleh.light.util.watchFlow
+import com.nestoleh.light.util.everyMinuteChangeFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
@@ -21,7 +20,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.seconds
 
 class CalculateNearestElectricityPeriodsUseCase(
     private val dispatcher: CoroutineDispatcher
@@ -41,14 +39,16 @@ class CalculateNearestElectricityPeriodsUseCase(
                         )
                     )
                 } else {
-                    watchFlow(1.seconds)
-                        .distinctUntilChangedBy { it.toLocalDateTime(TimeZone.currentSystemDefault()).minute }
+                    everyMinuteChangeFlow()
                         .map { now: Instant ->
                             val localNow = now.toLocalDateTime(TimeZone.currentSystemDefault())
                             val currentDay = localNow.dayOfWeek.ordinal
                             val currentHour = localNow.hour
                             val currentBlockIndex = blocks.findBlockIndexFor(currentDay, currentHour)
-                            val reformattedBlocks = blocks.reformatStartingFrom(currentBlockIndex)
+                            val reformattedBlocks = blocks.reformatStartingFrom(
+                                index = currentBlockIndex,
+                                currentDay = currentDay,
+                            )
                             Logger.d { "Reformatted blocks -> [${reformattedBlocks.size}] --> $reformattedBlocks" }
                             NearestElectricityPeriods(
                                 current = reformattedBlocks[0].toElectricityStatusPeriod(now),
@@ -84,7 +84,8 @@ class CalculateNearestElectricityPeriodsUseCase(
     }
 
     private fun List<IndependentElectricityStatusBlock>.reformatStartingFrom(
-        index: Int
+        index: Int,
+        currentDay: Int
     ): List<IndependentElectricityStatusBlock> {
         return if (index == 0) {
             val first = this.first()
@@ -104,7 +105,6 @@ class CalculateNearestElectricityPeriodsUseCase(
             }
         } else {
             val stickEndWithStart = index != 0 && this.last().status == this.first().status
-            val daysShift = this[index].dayStart
             val newList = mutableListOf<IndependentElectricityStatusBlock>()
             newList.addAll(this.subList(index, if (stickEndWithStart) this.size - 1 else this.size))
             if (stickEndWithStart) {
@@ -127,8 +127,8 @@ class CalculateNearestElectricityPeriodsUseCase(
                     })
             newList.map {
                 it.copy(
-                    dayStart = it.dayStart - daysShift,
-                    dayEnd = it.dayEnd - daysShift
+                    dayStart = it.dayStart - currentDay,
+                    dayEnd = it.dayEnd - currentDay
                 )
             }
         }

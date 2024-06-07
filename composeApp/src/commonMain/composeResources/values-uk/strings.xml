@@ -15,7 +15,7 @@
     <string name="day_tuesday">Вівторок</string>
     <string name="day_wednesday">Середа</string>
     <string name="day_thursday">Четвер</string>
-    <string name="day_friday">П\'ятниця</string>
+    <string name="day_friday">П'ятниця</string>
     <string name="day_saturday">Субота</string>
     <string name="day_sunday">Неділя</string>
 
@@ -30,7 +30,7 @@
     <!-- Status -->
     <string name="electricity_status_name_on">Увімкнено</string>
     <string name="electricity_status_name_off">Вимкнено</string>
-    <string name="electricity_status_name_possible_off">Можливо вимкнено</string>
+    <string name="electricity_status_name_possible_off">Можливо\u00A0вимкнено</string>
 
     <!-- Electricity period -->
     <string name="electricity_period_label_status">Статус: %1$s</string>
